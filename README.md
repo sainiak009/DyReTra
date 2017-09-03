@@ -9,6 +9,6 @@ Urban population in India is on a rise, and the time is not far away in the futu
 
 ## To run development server
 * Install application as a python package in Virtual Environment - `pip install --editable .`
-* export FLASK_APP=DyReTra
-* export FLASK_DEBUG=true
-* flask run
+* `export FLASK_APP=DyReTra`
+* `export FLASK_DEBUG=true`
+* `flask run`
