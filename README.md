@@ -6,6 +6,8 @@ Urban population in India is on a rise, and the time is not far away in the futu
 ## Built With
 
 * [Flask](http://flask.pocoo.org/) - The python web framework used
+* [googlemaps](https://github.com/googlemaps/google-maps-services-python) - Python client library for Google Maps API Web Services
+* [Flask-RESTful](http://flask-restful.readthedocs.io/en/latest/) - Flask extention for building RESTful APIs 
 
 ## To run development server
 * Install application as a python package in Virtual Environment - `pip install --editable .`
