@@ -1,0 +1,3 @@
+DEBUG = True
+SECRET_KEY = 'j82H"uXlF2Pu32QMxRkcu_3lME^h-1T>[OauO$L{*s,MXC81|;VTU0v.,sI/}OR'
+GOOGLE_KEY = 'AIzaSyD_P0uvNw6vPQOCU1lisTfM3mJer4ub_eI'
