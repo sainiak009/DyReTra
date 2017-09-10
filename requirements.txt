@@ -1,4 +1,4 @@
--e git+https://github.com/sainiak009/DyReTra.git@7bf136c77793999be0d286f9bf975c03fda04280#egg=DyReTra-origin/master
+-e git+https://github.com/sainiak009/DyReTra.git@bd2832441039fd0bf76a6bdc4adf424ded477a71#egg=DyReTra-master
 Flask==0.12.2
 Flask-RESTful==0.3.6
 Jinja2==2.9.6
@@ -14,5 +14,6 @@ itsdangerous==0.24
 python-dateutil==2.6.1
 pytz==2017.2
 requests==2.18.4
+selenium==3.5.0
 six==1.10.0
 urllib3==1.22
