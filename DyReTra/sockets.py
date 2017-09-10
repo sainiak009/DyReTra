@@ -44,7 +44,8 @@ def sendState(data):
 
 
 def emit_state(tl_id, cluster_id, run_time):
-	emit('cluster-response', {"data": tl_id + " : " + str(run_time)}, room=cluster_id)
+	print("hello")
+	socketio.emit('cluster-response', {"data": tl_id + " : " + str(run_time)}, room=cluster_id)
 
 
 def run():

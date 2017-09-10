@@ -11,10 +11,12 @@
 		<button id="emit">Emit</button>
 	</div>
 	<div id="form2">
-		<input id="cluster_id" type="hidden" />
+		<input id="cluster_id" type="text" />
 		<input id="tl_id" type="text" />
 		<button id="join">JOIN</button>
 	</div>
+
+	<button id="start_simulation">Start Simulation</button>
 
 
 	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
@@ -40,6 +42,18 @@
 		    	console.log(msg);
 		    	$('#cluster_id').val(msg.data.cluster_id)
 		    	$('#log').append('<p>' + msg.data + '</p>');
+		    });
+
+		    $('#start_simulation').click(function () {
+		    	$.ajax({
+		    		url: '/start_cluster_simulation',
+		    		type: 'GET',
+		    		data: {cluster_id: $('#cluster_id').val()},
+		    		success: function(response) {
+		    			console.log(response);
+		    		}
+		    	});
+		    	
 		    });
 		});
 	</script>

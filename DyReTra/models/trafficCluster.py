@@ -1,4 +1,4 @@
-from connection import Db
+from models.connection import Db
 
 class TrafficCluster(Db):
 	"""
@@ -8,30 +8,31 @@ class TrafficCluster(Db):
 
 	"""
 	def __init__(self, cluster_id=None):
-		Db.__init__(lf)
+		Db.__init__(self)
 		self.coll_name = "traffic_cluster"
 		self._exists = False
 		self._schema = {
 			"cluster_id": None,  # string
-			"traffic_signals": []  # List having TL ids
+			"traffic_signals": [],  # List having TL ids
 			"coordinates": {
 				"lat": None,
 				"long": None
 			}
 		}
-		if self.coll_name not in self.db.collection_name():
+		if self.coll_name not in self.db.collection_names():
 			self.create_collection(self.coll_name, validator= {
 					"validator": {
 						{"cluster_id": {"$type": "string"}},
 						{"traffic_signals": {"$type": "array"}}
 					},
-					"validation_action": "erro"
+					"validation_action": "error"
 				})
 		if cluster_id:
-			cursor = self.db[self.coll_name].find({"cluster_id": cluster_id})
+			cursor = self.db[self.coll_name].find({"cluster_id": int(cluster_id)})
+			for c in cursor:
+				self._schema = c
 			if cursor.count() == 1:
 				self._exists = True
-				self._schema = cursor[0]
 
 
 	def exists(self):

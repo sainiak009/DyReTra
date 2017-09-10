@@ -5,7 +5,9 @@ from random import randint
 
 from config import app
 from sockets import run as start_socket
-from flask import render_template
+# from tasks import run as start_scheduler
+from simulator import simulateCluster, run as start_scheduler
+from flask import render_template, request
 
 # app = Flask(__name__)
 # app.config.from_object(__name__)
@@ -61,10 +63,15 @@ from flask import render_template
 # All functions will go here 
 @app.route('/')
 def hello_world():
+    # return "hi"
     return render_template('index.html')
 
+@app.route('/start_cluster_simulation', methods=['POST', 'GET'])
+def start_cluster_simulator():
+	print(request.args.get('cluster_id', None))
+	simulateCluster(cluster_id=request.args.get('cluster_id', None))
+	return request.args.get('cluster_id', 'Hola')
 
 if __name__ == "__main__":
 	start_socket()
-	# scheduler.add_listener(all_job_listener)
-	# scheduler.start()
+	start_scheduler()

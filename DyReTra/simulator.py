@@ -1,8 +1,14 @@
 import time
 from datetime import datetime, timedelta
+from random import randint
 
 from models.trafficCluster import TrafficCluster
-from tasks import scheduleEvent
+from sockets import emit_state
+from models.allJobs import AllJobs
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.events import JobExecutionEvent
+
+scheduler = BackgroundScheduler()
 
 
 def _calculateTime(cluster_id, tl_id):
@@ -36,12 +42,11 @@ def simulateCluster(cluster_id=None, job_id=None):
 				scheduleEvent(cluster_id, tl_id, run_time)
 		else:
 			raise "Cluster with no traffic signals"
-
 	else:
 		raise "Cluster doesn't exists"
 
 
-def addTLtoCluster(tl_id, cluster_id)
+def addTLtoCluster(tl_id, cluster_id):
 	cluster = TrafficCluster(cluster_id=cluster_id)
 	if cluster.exists():
 		cluster_data = cluster.get()
@@ -68,4 +73,19 @@ def createCluster(cluster_data):
 	return True
 
 
-def scheduledEventListener(event):
+def scheduleEvent(cluster_id, tl_id, run_time):
+	print(run_time)
+	emit_state(cluster_id, tl_id, run_time)
+	new_job = scheduler.add_job(lambda: emit_state(cluster_id, tl_id, run_time), 'date', run_date=run_time)
+	all_job = AllJobs()
+	new_job_data = {"cluster_id": cluster_id, "tl_id": tl_id, "job_id": new_job.id}
+	all_job.create(new_job_data)
+
+def _eventListener(event):
+	print(event)
+	if isinstance(event, JobExecutionEvent):
+		simulateCluster(job_id=event.job_id)
+
+def run():
+	scheduler.add_listener(_eventListener)
+	scheduler.start()
