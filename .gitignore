@@ -1,3 +1,9 @@
+.gitignore
 DyReTra.egg-info/
 __pycache__/
 *pyc
+bin/
+include/
+lib/
+local/
+share/

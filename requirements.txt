@@ -17,3 +17,5 @@ six==1.10.0
 urllib3==1.22
 eventlet==0.20.1
 flask-socketio==2.9.2
+pymongo==3.1.1
+apscheduler==3.3.1

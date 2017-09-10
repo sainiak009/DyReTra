@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>DyReTra EVs</title>
+</head>
+<body>
+	<h1>EVs</h1>
+	<div id="log"></div>
+	<div id="form1">
+		<input id="emit_data" type="text" />
+		<button id="emit">Emit</button>
+	</div>
+	<div id="form2">
+		<input id="cluster_id" type="hidden" />
+		<input id="tl_id" type="text" />
+		<button id="join">JOIN</button>
+	</div>
+
+
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function(){
+		    var socket = io.connect('http://' + document.domain + ':' + location.port + '/tl');
+
+		   	// $('#emit').click(function (event) {
+		   	// 	event.preventDefault();
+		   	// 	socket.emit('tl-cluster', {data: $('#emit_data').val()});
+		   	// 	return false;
+		   	// });
+		   	$('#join').click(function (event) {
+		   		event.preventDefault();
+		   		socket.emit('join-tl-cluster', {"tl_id": $('#tl_id').val(), "cluster_id": $('#cluster_id').val()});
+		   		return false;
+		   	});
+		    socket.on('cluster-response', function(msg) {
+		        $('#log').append('<p>Received: ' + msg.data + '</p>');
+		    });
+		    socket.on('get-cluster-response', function(msg) {
+		    	console.log(msg);
+		    	$('#cluster_id').val(msg.data.cluster_id)
+		    	$('#log').append('<p>' + msg.data + '</p>');
+		    });
+		});
+	</script>
+</body>
+</html>
