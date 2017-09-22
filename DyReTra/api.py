@@ -5,11 +5,11 @@ from selenium import webdriver
 from selenium.common.exceptions import TimeoutException
 from datetime import datetime
 
-from config import app
+# from config import app
 from config_values import GOOGLE_KEY
-api = Api(app)
 
-# # Congigurations
+
+# Congigurations
 gmaps = googlemaps.Client(key=GOOGLE_KEY)
 
 # Parameters to get a path
@@ -22,6 +22,7 @@ MapTrafficParser.add_argument('latitude', type=float, required=True)
 MapTrafficParser.add_argument('longitude', type=float, required=True)
 
 
+# API to get path EVs
 class getDirectionsEV(Resource):
     def post(self):
         args = DirectionsParser.parse_args()
@@ -29,8 +30,6 @@ class getDirectionsEV(Resource):
         directions = gmaps.directions(args['origin'], args['destination'], mode="transit", departure_time=now)
         return directions
 
-
-api.add_resource(getDirectionsEV, '/getDirectionsEV')
 
 
 # API to get snapshot of traffic junction
@@ -63,5 +62,3 @@ class getMapSnap(Resource):
         driver.quit()
         return path
 
-
-api.add_resource(getMapSnap, '/getMapSnap')
