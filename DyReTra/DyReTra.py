@@ -3,6 +3,7 @@ from sockets import run as start_socket
 # from tasks import run as start_scheduler
 from simulator import simulateCluster, run as start_scheduler
 from flask import render_template, request
+from config_values import GOOGLE_KEY
 from api import *
 
 api = Api(app)
@@ -27,6 +28,10 @@ def start_cluster_simulator():
 @app.route('/trafficSnap/<lat>/<lon>')  # To generate traffic layers
 def traffic_snap(lat, lon):
     return render_template('traffic_layer.html', latitude=lat, longitude=lon)
+
+@app.route('/EVSimulator')	# Emergency Vehicles Simulations
+def EV_simulator():
+    return render_template('ev_simulation.html', GOOGLE_KEY=GOOGLE_KEY)
 
 
 if __name__ == "__main__":

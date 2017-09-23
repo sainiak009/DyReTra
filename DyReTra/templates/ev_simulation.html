@@ -2,8 +2,223 @@
 <html>
 <head>
 	<title>Emergency Vehicles Simlation</title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+	 <style>
+      /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+      #map {
+        height: 500px;
+      }
+      /* Optional: Makes the sample page fill the window. */
+      html, body {
+        margin: 0;
+        padding: 0;
+      }
+      .space-30{
+      	height: 30px;
+      }
+      .dest-cords{
+      	text-align: center;
+      }
+      .center-align{
+      	text-align: center;
+      }
+      #startSimulation{
+      	margin:auto;
+      }
+    </style>
 </head>
 <body>
+	<div class="container-fluid">
+	<div class="container">
+		<div class="row">
+			<div class="col-md-4">
+			<div class="space-30"></div>
+				<h3>Set Origin:</h3>
+				<form>
+  				<div class="row">
+				    <div class="col">
+				      <input type="text" class="form-control" placeholder="Latitude" id="ev_lat" value="12.9747584">
+				    </div>
+				    <div class="col">
+				      <input type="text" class="form-control" placeholder="Longitude" id="ev_lon" value="77.5366535">
+				    </div>
+				</div>
+				<br>
+				<button type="button" class="btn btn-dark" id="setOrigin">Set Origin</button>
+				</form>
+				<hr>
+				<h3>Set Destination:</h3>
+				<div class="col">
+				      <input type="text" class="form-control" placeholder="Enter Destination" id="pac-input">
+				</div>
+				<br>
+				<div class="row">
+				    <div class="col">
+				      <input type="text" class="form-control" placeholder="Set Destination" id="lat" disabled>
+				    </div>
+				    <div class="col">
+				      <input type="text" class="form-control" placeholder="Set Destination" id="lng" disabled>
+				    </div>
+				</div>
+				<br>
+				<button type="button" class="btn btn-dark" id="sendDest">Set Destination</button>
+			</div>
+			<div class="col-md-8">
+				<div id="map"></div>
+				<br>
+				<div class="row center-align">
+					<button type="button" class="btn btn-dark" id="startSimulation">Start Simulation</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	</div>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<script>
+    function initMap(EV_origin_lat = 0, EV_origin_lng = 0, EV_dest_lat = 0, EV_dest_lng = 0) {
+    	var origin;
 
+    	//Setting Origin
+    	if(EV_origin_lng && EV_origin_lat){
+    		origin = {lat: parseFloat(EV_origin_lat), lng: parseFloat(EV_origin_lng)};
+    	}else{
+    		origin = {lat: 12.9747584, lng: 77.5366535}; //If not given set Bengaluru
+    	}
+
+        //Setting Map
+        var map = new google.maps.Map(document.getElementById('map'), {
+          center: origin,
+          zoom: 17
+        });
+
+		//Destination Search Box---------------------------------------------------------------------------
+        
+        // Create the search box and link it to the UI element.
+        var input = document.getElementById('pac-input');
+        var searchBox = new google.maps.places.SearchBox(input);
+
+         // Bias the SearchBox results towards current map's viewport.
+        map.addListener('bounds_changed', function() {
+          searchBox.setBounds(map.getBounds());
+        });
+
+         // Listen for the event fired when the user selects a prediction and retrieve
+        // more details for that place.
+         map.addListener('bounds_changed', function() {
+          searchBox.setBounds(map.getBounds());
+        });
+
+        var markers = [];
+        // Listen for the event fired when the user selects a prediction and retrieve
+        // more details for that place.
+        searchBox.addListener('places_changed', function() {
+          var places = searchBox.getPlaces();
+
+          if (places.length == 0) {
+            return;
+          }
+
+          // For each place, get the icon, name and location.
+          var bounds = new google.maps.LatLngBounds();
+          places.forEach(function(place) {
+            if (!place.geometry) {
+              console.log("Returned place contains no geometry");
+              return;
+            }
+            // var icon = {
+            //   url: place.icon,
+            //   size: new google.maps.Size(71, 71),
+            //   origin: new google.maps.Point(0, 0),
+            //   anchor: new google.maps.Point(17, 34),
+            //   scaledSize: new google.maps.Size(25, 25)
+            // };
+
+            $("#lat").val(place.geometry.location.lat());
+            $("#lng").val(place.geometry.location.lng());
+            // Create a marker for each place.
+            markers.push(new google.maps.Marker({
+              map: map,
+              // icon: icon,
+              label: 'B',
+              title: place.name,
+              position: place.geometry.location
+            }));
+
+            if (place.geometry.viewport) {
+              // Only geocodes have viewport.
+              bounds.union(place.geometry.viewport);
+            } else {
+              bounds.extend(place.geometry.location);
+            }
+          });
+          map.fitBounds(bounds);
+        });
+
+
+       	//Setting Directions--------------------------------------------------------------------------
+
+        var directionsDisplay = new google.maps.DirectionsRenderer({
+          		map: map
+        });
+
+        //Set destination, origin and travel mode.
+        if(EV_dest_lng && EV_dest_lat){
+        	request = {
+          		destination: {lat: parseFloat(EV_dest_lat), lng: parseFloat(EV_dest_lng)},
+          		origin: origin,
+          		travelMode: 'DRIVING'
+       		}
+
+       		// Pass the directions request to the directions service.
+        	var directionsService = new google.maps.DirectionsService();
+	        directionsService.route(request, function(response, status) {
+	          if (status == 'OK') {
+	            // Display the route on the map.
+	            directionsDisplay.setDirections(response);
+	          }
+	        });
+
+        }else{
+        	//Setting origin marker
+        	var EVMarker1 = new google.maps.Marker({
+          		position: origin,
+          		map: map,
+          		title: 'Ambulance',
+          		label: 'A'
+        	});
+        }
+
+
+        
+      };
+
+    $("#setOrigin").click(function(){
+		var lat = $("#ev_lat").val();
+		var lon = $("#ev_lon").val();
+		initMap(lat, lon);
+		console.log("EV Origin set")
+	});
+
+    $("#sendDest").click(function(){ // API Call to get Directions data and make server aware of our movement 
+  //   	$.post( "getDirectionsEV",
+  //   	{ origin_lat: $("#ev_lat").val(), origin_lng: $("#ev_lon").val(),
+  //   	destination_lat: $("#lat").val(), destination_lng: $("#lng").val()},
+  //   	function( data ) {
+  // 			console.log(data);
+  // 			initMap($("#ev_lat").val(), $("#ev_lon").val(), $("#lat").val(), $("#lng").val());
+		// }, "json");
+		initMap($("#ev_lat").val(), $("#ev_lon").val(), $("#lat").val(), $("#lng").val());
+    });
+
+    // Writing Simulation code
+    $("#startSimulation").click(function(){
+
+    });
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key={{GOOGLE_KEY}}&libraries=places&callback=initMap"
+        async defer></script>
 </body>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
 </html>

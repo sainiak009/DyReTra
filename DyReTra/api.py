@@ -14,20 +14,24 @@ gmaps = googlemaps.Client(key=GOOGLE_KEY)
 
 # Parameters to get a path
 DirectionsParser = reqparse.RequestParser(bundle_errors=True)
-DirectionsParser.add_argument('origin', type=str, required=True)
-DirectionsParser.add_argument('destination', type=str, required=True)
+DirectionsParser.add_argument('origin_lat', type=float, required=True)
+DirectionsParser.add_argument('origin_lng', type=float, required=True)
+DirectionsParser.add_argument('destination_lat', type=float, required=True)
+DirectionsParser.add_argument('destination_lng', type=float, required=True)
 # Parameters to get traffic details
 MapTrafficParser = reqparse.RequestParser(bundle_errors=True)
 MapTrafficParser.add_argument('latitude', type=float, required=True)
 MapTrafficParser.add_argument('longitude', type=float, required=True)
 
 
-# API to get path EVs
+# API to get path for EVs
 class getDirectionsEV(Resource):
     def post(self):
         args = DirectionsParser.parse_args()
         now = datetime.now()
-        directions = gmaps.directions(args['origin'], args['destination'], mode="transit", departure_time=now)
+        origin = str(args['origin_lat']) + ',' + str(args['origin_lng'])
+        destination = str(args['destination_lat']) + ',' + str(args['destination_lng'])
+        directions = gmaps.directions(origin, destination, departure_time=now)
         return directions
 
 
@@ -50,7 +54,6 @@ class getMapSnap(Resource):
             request_url = 'http://127.0.0.1:5000/trafficSnap/' + str(args['latitude']) + '/' + str(args['longitude'])
             driver.get(request_url)
         except TimeoutException as ex:
-            isrunning = 0  # UNUSED
             driver.close()
             return "Exception has been thrown. " + str(ex)
 
