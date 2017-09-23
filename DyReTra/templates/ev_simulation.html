@@ -38,10 +38,10 @@
 				<form>
   				<div class="row">
 				    <div class="col">
-				      <input type="text" class="form-control" placeholder="Latitude" id="ev_lat" value="12.9747584">
+				      <input type="text" class="form-control" placeholder="Latitude" id="ev_lat" value="22.5748516">
 				    </div>
 				    <div class="col">
-				      <input type="text" class="form-control" placeholder="Longitude" id="ev_lon" value="77.5366535">
+				      <input type="text" class="form-control" placeholder="Longitude" id="ev_lon" value="88.40156619999993">
 				    </div>
 				</div>
 				<br>
@@ -88,9 +88,9 @@
   var speed = 0.000005, wait = 1;
   var infowindow = null;
   
-    var myPano;   
-    var panoClient;
-    var nextPanoId;
+  var myPano;   
+  var panoClient;
+  var nextPanoId;
   var timerHandle = null;
 
 function createMarker(latlng, label, html) {
@@ -119,7 +119,7 @@ function createMarker(latlng, label, html) {
     	if(EV_origin_lng && EV_origin_lat){
     		origin = {lat: parseFloat(EV_origin_lat), lng: parseFloat(EV_origin_lng)};
     	}else{
-    		origin = {lat: 12.9747584, lng: 77.5366535}; //If not given set Bengaluru
+    		origin = {lat: 22.5748516, lng: 88.40156619999993}; //If not given set Kolkata
     	}
 
         //Setting Map
@@ -162,14 +162,7 @@ function createMarker(latlng, label, html) {
               console.log("Returned place contains no geometry");
               return;
             }
-            // var icon = {
-            //   url: place.icon,
-            //   size: new google.maps.Size(71, 71),
-            //   origin: new google.maps.Point(0, 0),
-            //   anchor: new google.maps.Point(17, 34),
-            //   scaledSize: new google.maps.Size(25, 25)
-            // };
-
+ 
             $("#lat").val(place.geometry.location.lat());
             $("#lng").val(place.geometry.location.lng());
             // Create a marker for each place.
@@ -191,8 +184,14 @@ function createMarker(latlng, label, html) {
           map.fitBounds(bounds);
         });
 
+        // Rendering Traffic layer-----------------------------------------------------------------------
 
-       	//Setting Directions--------------------------------------------------------------------------
+
+        var trafficLayer = new google.maps.TrafficLayer();
+        trafficLayer.setMap(map);
+
+
+       	// Rendering Directions--------------------------------------------------------------------------
 
         directionsDisplay = new google.maps.DirectionsRenderer({
           		map: map
@@ -203,7 +202,10 @@ function createMarker(latlng, label, html) {
         	request = {
           		destination: {lat: parseFloat(EV_dest_lat), lng: parseFloat(EV_dest_lng)},
           		origin: origin,
-          		travelMode: 'DRIVING'
+          		travelMode: 'DRIVING',
+          		drivingOptions: {
+    				departureTime: new Date(Date.now())
+  				}
        		}
 
        		// Pass the directions request to the directions service.
@@ -225,16 +227,25 @@ function createMarker(latlng, label, html) {
         	});
         }
 
+        // Creating markers for Traffic lights----------------------------------------------
+        TL1Marker = new google.maps.Marker({
+          		position: {lat: 22.562005, lng: 88.408281},
+          		map: map,
+          		title: 'TL1',
+          		label: 'TL1'
+        	});
+
+        // Creating poly lines for Vehicular Movement 
         polyline = new google.maps.Polyline({
-	path: [],
-	strokeColor: '#FF0000',
-	strokeWeight: 3
-    });
-    poly2 = new google.maps.Polyline({
-	path: [],
-	strokeColor: '#FF0000',
-	strokeWeight: 3
-    });
+		path: [],
+		strokeColor: '#FF0000',
+		strokeWeight: 3
+	    });
+	    poly2 = new google.maps.Polyline({
+		path: [],
+		strokeColor: '#FF0000',
+		strokeWeight: 3
+	    });
 
     //=============== ~animation funcitons =====================
 
@@ -443,9 +454,8 @@ directionsDisplay = new google.maps.DirectionsRenderer(rendererOptions);
           }
         }
 
-        polyline.setMap(map);
-        map.fitBounds(bounds);
-//        createMarker(endLocation.latlng,"end",endLocation.address,"red");
+    polyline.setMap(map);
+    map.fitBounds(bounds);
 	map.setZoom(18);
 	startAnimation();
     }                                                    
@@ -454,7 +464,7 @@ directionsDisplay = new google.maps.DirectionsRenderer(rendererOptions);
   
 
   
-      var step = 50; // 5; // metres
+      var step = 5; // 5; // metres
       var tick = 100; // milliseconds
       var eol;
       var k=0;
@@ -468,7 +478,6 @@ directionsDisplay = new google.maps.DirectionsRenderer(rendererOptions);
         // Spawn a new polyline every 20 vertices, because updating a 100-vertex poly is too slow
         if (poly2.getPath().getLength() > 20) {
           poly2=new google.maps.Polyline([polyline.getPath().getAt(lastVertex-1)]);
-          // map.addOverlay(poly2)
         }
 
         if (polyline.GetIndexAtDistance(d) < lastVertex+2) {
@@ -483,13 +492,15 @@ directionsDisplay = new google.maps.DirectionsRenderer(rendererOptions);
 
 
       function animate(d) {
-// alert("animate("+d+")");
         if (d>eol) {
           map.panTo(endLocation.latlng);
           marker.setPosition(endLocation.latlng);
           return;
         }
         var p = polyline.GetPointAtDistance(d);
+        console.log(polyline.GetPointAtDistance(d + 500).lat());
+        console.log(polyline.GetPointAtDistance(d + 500).lng());
+        if(checkIfWithInDistance(polyline.GetPointAtDistance(d + 100).lat(), polyline.GetPointAtDistance(d + 100).lng(), 22.562005, 88.408281, 1)) TL1Marker.setIcon('http://maps.google.com/mapfiles/ms/icons/green-dot.png');
         map.panTo(p);
         marker.setPosition(p);
         updatePoly(d);
@@ -500,14 +511,17 @@ directionsDisplay = new google.maps.DirectionsRenderer(rendererOptions);
 function startAnimation() {
         eol=google.maps.geometry.spherical.computeLength(polyline.getPath());
         map.setCenter(polyline.getPath().getAt(0));
-        // map.addOverlay(new google.maps.Marker(polyline.getAt(0),G_START_ICON));
-        // map.addOverlay(new GMarker(polyline.getVertex(polyline.getVertexCount()-1),G_END_ICON));
-        // marker = new google.maps.Marker({location:polyline.getPath().getAt(0)} /* ,{icon:car} */);
-        // map.addOverlay(marker);
         poly2 = new google.maps.Polyline({path: [polyline.getPath().getAt(0)], strokeColor:"#0000FF", strokeWeight:10});
-        // map.addOverlay(poly2);
         setTimeout("animate(50)",2000);  // Allow time for the initial map display
 }
+
+function checkIfWithInDistance(origin_lat, origin_lng, point_lat, point_lng, d){ // Distance in kilometer
+	var distance = Math.acos(Math.sin(origin_lat) * Math.sin(point_lat) + Math.cos(origin_lat) * Math.cos(point_lat) * Math.cos(point_lng - (origin_lng))) * 6371 ;
+
+	if(distance <= d) return true;
+	else false;
+}
+
     </script>
     <script src="https://maps.googleapis.com/maps/api/js?key={{GOOGLE_KEY}}&libraries=places&callback=initMap"
         async defer></script>
