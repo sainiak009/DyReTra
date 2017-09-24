@@ -67,9 +67,6 @@ def simulateCluster(cluster_id=None, job_id=None):
         Args
             cluster_id - Cluster Id of existing cluster
     """
-    print('++simCL++')
-    print(cluster_id)
-    print('++simCL++')
     if cluster_id is None and job_id is None:
         raise "Atleast one of cluster id or job id is required"
 

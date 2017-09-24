@@ -1,8 +1,8 @@
 from config import app
 from sockets import run as start_socket
-# from tasks import run as start_scheduler
-from simulator import simulateCluster, run as start_scheduler
+from simulator import simulateCluster
 from flask import render_template, request
+from flask_restful import Api
 from config_values import GOOGLE_KEY
 from api import *
 
@@ -14,11 +14,6 @@ api.add_resource(getMapSnap, '/getMapSnap')
 
 
 # All general routes will go here
-@app.route('/')
-def hello_world():
-    return render_template('index.html')
-
-
 @app.route('/signal')
 def traffic_signal():
     return render_template('traffic_signal.html')
@@ -43,5 +38,4 @@ def EV_simulator():
 
 if __name__ == "__main__":
     start_socket()
-    start_scheduler()
     app.run(threaded=True)
