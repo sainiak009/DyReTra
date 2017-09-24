@@ -18,11 +18,10 @@ class TrafficSignalData(Db):
         if self.coll_name not in self.db.collection_names():
             self.db.create_collection(self.coll_name)
         if cluster_id:
-            cursor = self.db[self.coll_name].find({"cluster_id": int(cluster_id)})
-            for c in cursor:
-                self._schema = c
-            if cursor.count() == 1:
-                self._exists = True
+            data = self.db[self.coll_name].find_one({"$query": {"cluster_id": str(cluster_id)}, "$orderby": {"timestamp": -1}})
+            if data:
+                del data['_id']
+                self._schema = data
 
     def exists(self):
         return self._exists

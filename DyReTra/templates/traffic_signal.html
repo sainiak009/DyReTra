@@ -75,8 +75,8 @@
 					<div class="card-header">
 						Logs
 					</div>
-					<div class="card-body">
-						mosdinoidsnnkdssdni
+					<div class="card-body" id="log">
+						
 					</div>
 				</div>
 			</div>
@@ -216,18 +216,20 @@
 			socket.on('join-cluster-response', function (data) {
 				// sync tl with cluster
 				console.log(data);
+				$('#log').append('<p>'+ data.message + '</p>');
 				traffic_signals = data.cluster_data.traffic_signals
 				populateTL();
 			});
 
 			socket.on('cluster-response', function (data) {
 				console.log(data);
-				// var timestamp = data.timestamp;
+				$('#log').append('<p>'+ data.message + '</p>');
 
 			});
 
 			socket.on('simulate-cluster-response', function(data) {
 				console.log(data);
+				$('#log').append('<p>'+ data.message + '</p>');
 				traffic_signal_data = data.data;
 				timestamp = data.timestamp;
 				total_no_of_cycles = traffic_signal_data.length;

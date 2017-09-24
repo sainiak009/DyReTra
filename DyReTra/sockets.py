@@ -3,6 +3,7 @@ from flask_socketio import SocketIO, emit, send, join_room, leave_room
 from config import app
 
 from models.trafficCluster import TrafficCluster
+from models.trafficSignalData import TrafficSignalData
 
 socketio = SocketIO(app)
 
@@ -29,6 +30,12 @@ def joinTrafficCluster(data):
     cluster_data = cluster.get()
     del cluster_data['_id']
     emit('join-cluster-response', {"message": tl_id + " Joined Cluster " + cluster_id, "cluster_data": cluster_data}, room=cluster_id)
+    cluster_signal = TrafficSignalData(cluster_id)
+    cluster_signal_data = cluster_signal.get()
+    emit('simulate-cluster-response',
+         {"message": "Signal Received", "data": cluster_signal_data['traffic_signals'], "timestamp": cluster_signal_data['timestamp']},
+         room=cluster_id,
+         namespace='/tl')
 
 
 @socketio.on('leave-tl-cluster', namespace='/tl')
@@ -49,7 +56,7 @@ def sendState(data):
 
 def emit_state(cluster_id, tl_signal, total_time, timestamp):
     print("++ emit state ++")
-    socketio.emit('simulate-cluster-response', {"data": tl_signal, "timestamp": timestamp}, room=cluster_id, namespace="/tl")
+    socketio.emit('simulate-cluster-response', {"message": "Signal Received", "data": tl_signal, "timestamp": timestamp}, room=cluster_id, namespace="/tl")
 
 
 def run():
