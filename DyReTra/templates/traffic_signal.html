@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Traffic Signal Simulator</title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
+	<style type="text/css">
+		body {
+			background: #f7f7f7;
+		}
+		button {
+			cursor: pointer;
+		}
+		.row div {
+			margin-top: 5px;
+		}
+
+		.tl_frame {
+			position: relative;
+			float: left;
+			width:100px;
+			padding: 10px;
+			border: 1px solid grey;
+			border-radius: 5px;
+			margin-left: 10px;
+			text-align: center;
+		}
+		.light {
+			height: 60px;
+			width: 60px;
+			border-radius: 30px;
+			margin: 10px;
+		}
+		.red {
+			background: red;
+			opacity: 0.5;
+		}
+		.green {
+			background: green;
+			opacity: 0.5;
+		}
+		.orange {
+			background: orange;
+			opacity: 0.5;
+		}
+
+		#log {
+			height: 280px;	
+			max-height: 280px;	
+			overflow-y: scroll;
+		}
+
+		#time {
+			position: fixed;
+			top: 15px;
+			right: 5px;
+			z-index: 1234;
+			color: white;
+		}
+
+		.container {
+			padding: 10px;
+		}
+
+		#cluster_view {
+			max-height: 520px;
+			height: 520px;
+		}
+
+	</style>
+</head>
+<body>
+	<nav class="navbar navbar-expand-md navbar-dark bg-dark">
+		<a class="navbar-brand" href="#">Traffic Simulator</a>
+		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+		<span class="navbar-toggler-icon"></span>
+		</button>
+		<div class="collapse navbar-collapse" id="navbarsExampleDefault">
+			<ul class="navbar-nav mr-auto">
+				<li class="nav-item">
+					<a class="nav-link" href="#" data-toggle="modal" data-target="#instruction_modal">Instructions</span></a>
+				</li>
+			</ul>
+		</div>
+	</nav>
+	<div class="container">
+		<div class="row">
+			<div class="col-md-6">
+				<div class="card">
+					<div class="card-header">
+						Simulator
+					</div>
+					<div class="card-body">
+						<div class="form">
+							<div class="row">
+								<div class="col-md-12">
+									<input class="form-control" type="text" id="cluster_id" placeholder="Cluster ID" />
+								</div>
+								<div class="col-md-6">
+									<input class="form-control" type="text" id="tl_id" placeholder="Traffic Light ID" />
+								</div>
+								<div class="col-md-6">
+									<button class="form-control btn btn-primary" id="join">JOIN</button>
+								</div>
+								<div class="col-md-12">
+									<button class="form-control btn btn-primary" id="simulate">SIMULATE</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="card">
+					<div class="card-header">
+						Logs
+					</div>
+					<div class="card-body" id="log">
+						
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="card">
+					<div class="card-header">
+						Traffic Lights (JOIN Cluster to view TL)
+					</div>
+					<div class="card-body" id="cluster_view">
+						
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- Modal -->
+	<div class="modal fade" id="instruction_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-lg" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="exampleModalLabel">Instructions</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<pi>
+						<ul>
+							<li>This simulator is to demonstrate dynamic Traffic Lights.</li>
+							<li>Cluster Id is the id of the Traffic Light Cluster which Traffic Light belongs to. These two should be in the database two succesfully run the simulation.</li>
+							<li>On clicking <b>JOIN</b> the Traffic Light joins the corresponding cluster through a socket connection.</li>
+							<li>On clicking <b>SIMULATE</b>, simulation starts for one cluster cycle.</li>
+							<li><b>Test Inputs (As per the Database dump given)</b><br> Cluster Id - 123456, Traffic Light Id - a, b, c, d, e (Anyone for each window)<br>Cluster Id - 456789, Traffic Light Id - aa, bb, cc, dd, ee (Anyone for each window)</li>
+						</ul>
+					</p>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="time"></div>
+
+	<script type="text/javascript">
+		$(document).ready(function() {
+			var cluster_id = null;
+			var tl_id = null;
+			var traffic_signals = null;
+			var traffic_signal_data = null;
+			var timestamp = null;
+			var total_no_of_cycles = null;
+			var current_cycle = 0;
+			var simulation_running = false;
+
+			var socket = io.connect('http://' + document.domain + ':' + location.port + '/tl');
+
+			function startTime() {
+			    var today = new Date();
+			    var h = today.getHours();
+			    var m = today.getMinutes();
+			    var s = today.getSeconds();
+			    m = checkTime(m);
+			    s = checkTime(s);
+			    document.getElementById('time').innerHTML = h + ":" + m + ":" + s;
+			    if (traffic_signal_data != null && current_cycle < traffic_signal_data.length) {
+			    	if(timestamp + traffic_signal_data[current_cycle]['timer'] > Date.now()/1000) {
+			    		$.each(traffic_signals, function (key, tl) {
+			    			var t = $('#'+tl);
+			    			if(tl == traffic_signal_data[current_cycle]['tl_id']) {
+			    				t.find('.green').css('opacity', 1);
+								t.find('.red').css('opacity', 0.25);
+			    			} else {
+			    				t.find('.green').css('opacity', 0.25);
+								t.find('.red').css('opacity', 1);
+			    			}
+			    		});
+			    	} else {
+		    			timestamp += traffic_signal_data[current_cycle]['timer'];
+		    			current_cycle += 1;
+			    	}
+			    	if(current_cycle >= total_no_of_cycles) {
+			    		if(simulation_running) {
+			    			$('#log').append("<p><b>Simulation ended</b></p>");
+			    			simulation_running = false;
+			    		}
+			    	}
+			    }
+			    var t = setTimeout(startTime, 500);
+			}
+			function checkTime(i) {
+			    if (i < 10) {i = "0" + i};  // add zero in front of numbers < 10
+			    return i;
+			}
+			startTime();
+
+			function populateTL() {
+				for(var i=0; i<traffic_signals.length; i++) {
+					if($('#'+traffic_signals[i]).length == 0) {
+						var html_str = '\
+						<div class="tl_frame" id="'+traffic_signals[i]+'">\
+							<h4>'+traffic_signals[i]+'</h4>\
+							<div class="light red"></div>\
+							<div class="light orange"></div>\
+							<div class="light green"></div>\
+						</div>';
+						$('#cluster_view').append(html_str);
+					}
+				}
+			}
+
+			function chnageTlState(signal_data) {
+				for(var i=0; traffic_signals.length; i++) {
+					var tl = $('#'+traffic_signals[i]);
+					if(signal_data[traffic_signals[i]] != undefined) {
+						tl.find('.green').css('opacity', 1);
+						tl.find('.red').css('opacity', 0.25);
+						var time = signal_data[traffic_signals[i]];
+					} else {
+						tl.find('.green').css('opacity', 0.25);
+						tl.find('.red').css('opacity', 1);
+					}
+				}
+				return time;
+			}
+
+			$('#join').click(function () {
+				tl_id = $('#tl_id').val();
+				cluster_id = $('#cluster_id').val();
+				socket.emit('join-tl-cluster', {"tl_id": tl_id, "cluster_id": cluster_id});
+		   		return false;
+			});
+
+			$('#simulate').click(function () {
+				$.ajax({
+		    		url: '/start_cluster_simulation',
+		    		type: 'GET',
+		    		data: {cluster_id: cluster_id},
+		    		success: function(response) {
+		    			console.log(response);
+		    		}
+		    	});
+			});
+
+			socket.on('join-cluster-response', function (data) {
+				$('#log').append('<p>'+ data.message + '</p>');
+				traffic_signals = data.cluster_data.traffic_signals
+				populateTL();
+			});
+
+			socket.on('cluster-response', function (data) {
+				$('#log').append('<p>'+ data.message + '</p>');
+
+			});
+
+			socket.on('simulate-cluster-response', function(data) {
+				console.log(data);
+				$('#log').append('<p>'+ data.message + '   ' +JSON.stringify(data.data) +'</p>');
+				traffic_signal_data = data.data;
+				timestamp = data.timestamp;
+				total_no_of_cycles = traffic_signal_data.length;
+				current_cycle = 0;
+				simulation_running = true;
+			});
+		});
+	</script>
+</body>
+</html>
