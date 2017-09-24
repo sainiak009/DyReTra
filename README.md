@@ -30,8 +30,11 @@ mkdir -p $WORKON_HOME
 mkvirtualenv -p python3 dyretra
 ```
 
+
+### Install and Run MongoDB server
+[Install and Run MongoDB](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/)
+
 ### Install requirements and run server
 ```
 source start.sh
 ```
-
