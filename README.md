@@ -10,7 +10,31 @@ Urban population in India is on a rise, and the time is not far away in the futu
 * [Flask-RESTful](http://flask-restful.readthedocs.io/en/latest/) - Flask extention for building RESTful APIs 
 
 ## To run development server
-* Install application as a python package in Virtual Environment - `pip install --editable .`
-* `export FLASK_APP=DyReTra`
-* `export FLASK_DEBUG=true`
-* `flask run`
+### Install virtualenv
+```
+sudo apt-get install python-pip python-dev build-essentia
+sudo pip install virtualenv virtualenvwrapper
+sudo pip install --upgrade pip
+
+# Create a backup of your .bashrc file
+cp ~/.bashrc ~/.bashrc-org
+
+# Be careful with this command
+printf '\n%s\n%s\n%s' '# virtualenv' 'export WORKON_HOME=~/virtualenvs' \
+'source /usr/local/bin/virtualenvwrapper.sh' >> ~/.bashrc
+
+source ~/.bashrc
+
+mkdir -p $WORKON_HOME
+
+mkvirtualenv -p python3 dyretra
+```
+
+
+### Install and Run MongoDB server
+[Install and Run MongoDB](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/)
+
+### Install requirements and run server
+```
+source start.sh
+```

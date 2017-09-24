@@ -2,12 +2,8 @@
 DyReTra.egg-info/
 __pycache__/
 *pyc
-<<<<<<< HEAD
 bin/
 include/
 lib/
 local/
 share/
-=======
-trafficSnaps/
->>>>>>> master
