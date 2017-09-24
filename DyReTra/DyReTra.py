@@ -45,6 +45,11 @@ def hello_world():
     return render_template('index.html')
 
 
+@app.route('/signal')
+def traffic_signal():
+    return render_template('traffic_signal.html')
+
+
 @app.route('/start_cluster_simulation', methods=['POST', 'GET'])
 def start_cluster_simulator():
     print(request.args.get('cluster_id', None))
