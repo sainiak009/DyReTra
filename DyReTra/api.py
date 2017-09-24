@@ -1,6 +1,6 @@
 import googlemaps
 import uuid
-from flask_restful import Resource, Api, reqparse
+from flask_restful import Resource, reqparse
 from selenium import webdriver
 from selenium.common.exceptions import TimeoutException
 from datetime import datetime
@@ -35,7 +35,6 @@ class getDirectionsEV(Resource):
         return directions
 
 
-
 # API to get snapshot of traffic junction
 class getMapSnap(Resource):
     def post(self):
@@ -64,4 +63,3 @@ class getMapSnap(Resource):
         driver.save_screenshot(path)
         driver.quit()
         return path
-

@@ -12,6 +12,7 @@ api = Api(app)
 api.add_resource(getDirectionsEV, '/getDirectionsEV')
 api.add_resource(getMapSnap, '/getMapSnap')
 
+
 # All general routes will go here
 @app.route('/')
 def hello_world():
@@ -34,7 +35,8 @@ def start_cluster_simulator():
 def traffic_snap(lat, lon):
     return render_template('traffic_layer.html', latitude=lat, longitude=lon)
 
-@app.route('/EVSimulator')	# Emergency Vehicles Simulations
+
+@app.route('/EVSimulator')	 # Emergency Vehicles Simulations
 def EV_simulator():
     return render_template('ev_simulation.html', GOOGLE_KEY=GOOGLE_KEY)
 

@@ -1,19 +1,11 @@
-import pprint  # Remove this just for development
-import time
 import operator
 from random import randint
+from datetime import datetime
 
 from models.trafficCluster import TrafficCluster
 from sockets import emit_state
 from models.allJobs import AllJobs
 from models.trafficSignalData import TrafficSignalData
-from apscheduler.schedulers.background import BackgroundScheduler
-from apscheduler.events import JobExecutionEvent
-
-
-pp = pprint.PrettyPrinter(indent=4)
-
-scheduler = BackgroundScheduler()
 
 
 def _simulateTrafficDensity(cluster_id):
@@ -75,6 +67,9 @@ def simulateCluster(cluster_id=None, job_id=None):
         Args
             cluster_id - Cluster Id of existing cluster
     """
+    print('++simCL++')
+    print(cluster_id)
+    print('++simCL++')
     if cluster_id is None and job_id is None:
         raise "Atleast one of cluster id or job id is required"
 
@@ -95,6 +90,9 @@ def simulateCluster(cluster_id=None, job_id=None):
 
 
 def addTLtoCluster(tl_id, cluster_id):
+    """
+        Adds Traffic Light to corresponding Cluster
+    """
     cluster = TrafficCluster(cluster_id=cluster_id)
     if cluster.exists():
         cluster_data = cluster.get()
@@ -123,30 +121,7 @@ def createCluster(cluster_data):
 
 def scheduleEvent(cluster_id, tl_signal, total_time):
     # TODO: Add data to Traffic Signal Collection
-    timestamp = time.time()
+    time_now = datetime.now()
     ts = TrafficSignalData()
-    ts.create({"cluster_id": cluster_id, "traffic_signals": tl_signal, "timestamp": timestamp})
-    emit_state(cluster_id, tl_signal, total_time, timestamp)
-    # emit_state(cluster_id, tl_id, run_time)
-    # new_job = scheduler.add_job(lambda: emit_state(cluster_id, tl_id, run_time), 'date', run_date=run_time)
-    # all_job = AllJobs()
-    # new_job_data = {"cluster_id": cluster_id, "tl_id": tl_id, "job_id": new_job.id}
-    # all_job.create(new_job_data)
-
-
-def _eventListener(event):
-    print(event)
-    if isinstance(event, JobExecutionEvent):
-        simulateCluster(job_id=event.job_id)
-
-
-def run():
-    # scheduler.add_listener(_eventListener)
-    scheduler.start()
-
-
-if __name__ == "__main__":
-    t = _simulateTrafficDensity(123456)
-    pp.pprint(t)
-    u = _calculateTime(t)
-    pp.pprint(u)
+    ts.create({"cluster_id": cluster_id, "traffic_signals": tl_signal, "timestamp": int(time_now.timestamp())})
+    emit_state(cluster_id, tl_signal, total_time, int(time_now.timestamp()))

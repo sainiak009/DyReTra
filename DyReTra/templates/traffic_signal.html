@@ -8,6 +8,9 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
 	<style type="text/css">
+		body {
+			background: #f7f7f7;
+		}
 		button {
 			cursor: pointer;
 		}
@@ -44,34 +47,72 @@
 			opacity: 0.5;
 		}
 
+		#log {
+			height: 280px;	
+			max-height: 280px;	
+			overflow-y: scroll;
+		}
+
 		#time {
 			position: fixed;
-			top: 5px;
+			top: 15px;
 			right: 5px;
+			z-index: 1234;
+			color: white;
 		}
+
+		.container {
+			padding: 10px;
+		}
+
+		#cluster_view {
+			max-height: 520px;
+			height: 520px;
+		}
+
 	</style>
 </head>
 <body>
+	<nav class="navbar navbar-expand-md navbar-dark bg-dark">
+		<a class="navbar-brand" href="#">Traffic Simulator</a>
+		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+		<span class="navbar-toggler-icon"></span>
+		</button>
+		<div class="collapse navbar-collapse" id="navbarsExampleDefault">
+			<ul class="navbar-nav mr-auto">
+				<li class="nav-item">
+					<a class="nav-link" href="#" data-toggle="modal" data-target="#instruction_modal">Instructions</span></a>
+				</li>
+			</ul>
+		</div>
+	</nav>
 	<div class="container">
 		<div class="row">
 			<div class="col-md-6">
-				<div class="form">
-					<div class="row">
-						<div class="col-md-12">
-							<input class="form-control" type="text" id="cluster_id" placeholder="Cluster ID" />
-						</div>
-						<div class="col-md-6">
-							<input class="form-control" type="text" id="tl_id" placeholder="Traffic Light ID" />
-						</div>
-						<div class="col-md-6">
-							<button class="form-control btn btn-primary" id="join">JOIN</button>
-						</div>
-						<div class="col-md-12">
-							<button class="form-control btn btn-primary" id="simulate">SIMULATE</button>
+				<div class="card">
+					<div class="card-header">
+						Simulator
+					</div>
+					<div class="card-body">
+						<div class="form">
+							<div class="row">
+								<div class="col-md-12">
+									<input class="form-control" type="text" id="cluster_id" placeholder="Cluster ID" />
+								</div>
+								<div class="col-md-6">
+									<input class="form-control" type="text" id="tl_id" placeholder="Traffic Light ID" />
+								</div>
+								<div class="col-md-6">
+									<button class="form-control btn btn-primary" id="join">JOIN</button>
+								</div>
+								<div class="col-md-12">
+									<button class="form-control btn btn-primary" id="simulate">SIMULATE</button>
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>
-				<div class="class">
+				<div class="card">
 					<div class="card-header">
 						Logs
 					</div>
@@ -80,7 +121,42 @@
 					</div>
 				</div>
 			</div>
-			<div class="col-md-6" id="cluster_view">
+			<div class="col-md-6">
+				<div class="card">
+					<div class="card-header">
+						Traffic Lights (JOIN Cluster to view TL)
+					</div>
+					<div class="card-body" id="cluster_view">
+						
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- Modal -->
+	<div class="modal fade" id="instruction_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-lg" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="exampleModalLabel">Instructions</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<pi>
+						<ul>
+							<li>This simulator is to demonstrate dynamic Traffic Lights.</li>
+							<li>Cluster Id is the id of the Traffic Light Cluster which Traffic Light belongs to. These two should be in the database two succesfully run the simulation.</li>
+							<li>On clicking <b>JOIN</b> the Traffic Light joins the corresponding cluster through a socket connection.</li>
+							<li>On clicking <b>SIMULATE</b>, simulation starts for one cluster cycle.</li>
+							<li><b>Test Inputs (As per the Database dump given)</b><br> Cluster Id - 123456, Traffic Light Id - a, b, c, d, e (Anyone for each window)<br>Cluster Id - 456789, Traffic Light Id - aa, bb, cc, dd, ee (Anyone for each window)</li>
+						</ul>
+					</p>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -95,6 +171,7 @@
 			var timestamp = null;
 			var total_no_of_cycles = null;
 			var current_cycle = 0;
+			var simulation_running = false;
 
 			var socket = io.connect('http://' + document.domain + ':' + location.port + '/tl');
 
@@ -107,13 +184,9 @@
 			    s = checkTime(s);
 			    document.getElementById('time').innerHTML = h + ":" + m + ":" + s;
 			    if (traffic_signal_data != null && current_cycle < traffic_signal_data.length) {
-			    	console.log(current_cycle);
-			    	console.log(timestamp);
-			    	console.log(Date.now()/1000);
 			    	if(timestamp + traffic_signal_data[current_cycle]['timer'] > Date.now()/1000) {
 			    		$.each(traffic_signals, function (key, tl) {
 			    			var t = $('#'+tl);
-			    			console.log(current_cycle);
 			    			if(tl == traffic_signal_data[current_cycle]['tl_id']) {
 			    				t.find('.green').css('opacity', 1);
 								t.find('.red').css('opacity', 0.25);
@@ -126,6 +199,12 @@
 		    			timestamp += traffic_signal_data[current_cycle]['timer'];
 		    			current_cycle += 1;
 			    	}
+			    	if(current_cycle >= total_no_of_cycles) {
+			    		if(simulation_running) {
+			    			$('#log').append("<p><b>Simulation ended</b></p>");
+			    			simulation_running = false;
+			    		}
+			    	}
 			    }
 			    var t = setTimeout(startTime, 500);
 			}
@@ -136,7 +215,6 @@
 			startTime();
 
 			function populateTL() {
-				console.log(traffic_signals);
 				for(var i=0; i<traffic_signals.length; i++) {
 					if($('#'+traffic_signals[i]).length == 0) {
 						var html_str = '\
@@ -166,35 +244,7 @@
 				return time;
 			}
 
-			// function syncTL() {
-			// 	if(traffic_signal_data != null) {
-			// 		var timeout = 0;
-			// 		for(var i=0; i<traffic_signal_data.length; i++) {
-			// 			var signal_data = traffic_signal_data[i];
-			// 			console.log(signal_data);
-			// 			var timer = timeout;
-			// 			setTimeout(function () {
-			// 				$.each(traffic_signals, function(key, tl) {
-			// 					console.log(tl);
-			// 					var t = $('#'+traffic_signal_data[i]);
-			// 					if(tl == signal_data['tl_id']) {
-			// 						t.find('.green').css('opacity', 1);
-			// 						t.find('.red').css('opacity', 0.25);
-			// 						timer = signal_data['timer'];
-			// 					} else {
-			// 						t.find('.red').css('opacity', 1);
-			// 						t.find('.green').css('opacity', 0.25);
-			// 					}
-			// 					console.log(timer);
-			// 				});
-			// 			}, timeout*1000);
-			// 			timeout = timer;
-			// 		}
-			// 	}
-			// }
-
 			$('#join').click(function () {
-				console.log('join click');
 				tl_id = $('#tl_id').val();
 				cluster_id = $('#cluster_id').val();
 				socket.emit('join-tl-cluster', {"tl_id": tl_id, "cluster_id": cluster_id});
@@ -202,7 +252,6 @@
 			});
 
 			$('#simulate').click(function () {
-				// socket.emit('simulate-cluster', {"cluster_id": cluster_id});
 				$.ajax({
 		    		url: '/start_cluster_simulation',
 		    		type: 'GET',
@@ -214,28 +263,24 @@
 			});
 
 			socket.on('join-cluster-response', function (data) {
-				// sync tl with cluster
-				console.log(data);
 				$('#log').append('<p>'+ data.message + '</p>');
 				traffic_signals = data.cluster_data.traffic_signals
 				populateTL();
 			});
 
 			socket.on('cluster-response', function (data) {
-				console.log(data);
 				$('#log').append('<p>'+ data.message + '</p>');
 
 			});
 
 			socket.on('simulate-cluster-response', function(data) {
 				console.log(data);
-				$('#log').append('<p>'+ data.message + '</p>');
+				$('#log').append('<p>'+ data.message + '   ' +JSON.stringify(data.data) +'</p>');
 				traffic_signal_data = data.data;
 				timestamp = data.timestamp;
 				total_no_of_cycles = traffic_signal_data.length;
 				current_cycle = 0;
-				console.log(traffic_signal_data);
-				// syncTL();
+				simulation_running = true;
 			});
 		});
 	</script>
