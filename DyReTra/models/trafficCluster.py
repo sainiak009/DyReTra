@@ -15,7 +15,7 @@ class TrafficCluster(Db):
         self._exists = False
         self._schema = {
             "cluster_id": None,  # string
-            "traffic_signals": [],  # List having TL ids
+            "roads": [],  # List having TL ids
             "coordinates": {
                 "lat": None,
                 "long": None
@@ -25,7 +25,7 @@ class TrafficCluster(Db):
             self.create_collection(self.coll_name, validator={
                     "validator": {
                         {"cluster_id": {"$type": "string"}},
-                        {"traffic_signals": {"$type": "array"}}
+                        {"roads": {"$type": "array"}}
                     },
                     "validation_action": "error"
                 })
@@ -35,6 +35,21 @@ class TrafficCluster(Db):
                 self._schema = c
             if cursor.count() == 1:
                 self._exists = True
+
+    def _validateData(self, data):
+        if data["approach_fl"] == 0 and data["traffic_signal"] != []:
+            return False
+        return True
+
+    def getRoadDictStr(self):
+        road_dict = {
+            "road_id": None,
+            "approach_fl": None,
+            "slope": None,
+            "cv_coord": [],
+            "traffic_signal": []
+        }
+        return road_dict
 
     def exists(self):
         return self._exists
@@ -50,15 +65,17 @@ class TrafficCluster(Db):
             },
             {
                 "$set": {
-                    "traffic_signals": data['traffic_signals'],
+                    "roads": data['roads'],
                     "coordinates": data['coordinates']
                 }
             })
         return data['cluster_id']
 
     def create(self, data):
-        self.db[self.coll_name].insert_one(data)
-        return data['cluster_id']
+        if self._validateData(data):
+            self.db[self.coll_name].insert_one(data)
+            return data['cluster_id']
+        return False
 
     def createMany(self, data):
         self.db[self.coll_name].insert_many(data)
