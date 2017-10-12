@@ -49,7 +49,7 @@ class getMapSnap(Resource):
         chrome_options.add_argument('--proxy-bypass-list=%s' % "127.0.0.1*;localhost*")
 
         # Browsing page
-        driver = webdriver.Chrome(chrome_options=chrome_options)
+        driver = webdriver.Chrome()
         try:
             driver.set_page_load_timeout(20)
             request_url = 'http://127.0.0.1:5000/trafficSnap/' + str(args['latitude']) + '/' + str(args['longitude'])

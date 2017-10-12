@@ -10,11 +10,12 @@ colors = [
     [0, 255, 160, 0, 255, 165, 10]
 ]
 
-with open('config/node_config.json') as json_file:
+# with open('config/node_config.json') as json_file:
+with open('dyretra_cv/config/node_config.json') as json_file:
     roads = json.load(json_file)['roads']
 
 
-snapshot = cv2.imread("inputs/traffic2.png", -1)
+snapshot = cv2.imread("dyretra_cv/inputs/traffic.png", -1)
 snapshot_hsv = cv2.cvtColor(snapshot, cv2.COLOR_BGR2HSV)
 snapshot_res = []
 road_data = []
@@ -28,14 +29,23 @@ for color in colors :
 
     mask = cv2.inRange(hsv, lower_limit, upper_limit)
     res = cv2.bitwise_and(frame,frame, mask= mask)
+    # cv2.imshow('snapshot', res)
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()
 
     gray = cv2.cvtColor(res,cv2.COLOR_BGR2GRAY)
-    minLineLength = 50
+    minLineLength = 30
     maxLineGap = 50
     lines = cv2.HoughLinesP(gray,5,np.pi/180,1000, minLineLength = minLineLength, maxLineGap = maxLineGap)
+    for linest in lines:
+        for x1,y1,x2,y2 in linest:
+            cv2.line(frame,(x1,y1),(x2,y2),(0,255,255),2)
+    cv2.imshow('snapshot', frame)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
     snapshot_res.append(lines)
 
-# print snapshot_res
+print(snapshot_res)
 
 for (road1, road2) in roads :
 
@@ -71,11 +81,16 @@ for (road1, road2) in roads :
                 cv_road_th = math.degrees(math.atan(cv_road_m))
                 cv_road_d = (cv_road_m*cv_road[0] - cv_road[1])/math.sqrt(cv_road_m**2 + 1)
 
-            if math.fabs(cv_road_th - road1_th) < 5 and math.fabs(cv_road_d - road1_d) == 0 :
+                try:
+                    print(str(math.fabs(cv_road_th - road1_th)) + " and "+ str(math.fabs(cv_road_d - road1_d)))
+                except Exception as e:
+                    print("fail")
+
+            if math.fabs(cv_road_th - road1_th) < 5.0 and math.fabs(cv_road_d - road1_d) < 1.0 :
                 road1_sig = color_i
-            if math.fabs(cv_road_th - road2_th) < 5 and math.fabs(cv_road_d - road2_d) == 0 :
+            if math.fabs(cv_road_th - road2_th) < 5.0 and math.fabs(cv_road_d - road2_d) < 1.0 :
                 road2_sig = color_i
     road_data_temp.append(road1_sig)
     road_data_temp.append(road2_sig)
     road_data.append(road_data_temp)
-print road_data
+print(road_data)
