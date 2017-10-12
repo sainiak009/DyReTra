@@ -1,5 +1,6 @@
 import googlemaps
 import uuid
+import os
 from flask_restful import Resource, reqparse
 from selenium import webdriver
 from selenium.common.exceptions import TimeoutException
@@ -52,16 +53,16 @@ class getMapSnap(Resource):
         driver = webdriver.Chrome(chrome_options=chrome_options)
         try:
             driver.set_page_load_timeout(20)
-            request_url = 'http://127.0.0.1:5000/trafficSnap/' + str(args['latitude']) + '/' + str(args['longitude'])
+            request_url = 'https://sainiak009.github.io/DyReTra/trafficLayer?lat=' + str(args['latitude']) + '&lng=' + str(args['longitude'])
             driver.get(request_url)
         except TimeoutException as ex:
             driver.close()
             return "Exception has been thrown. " + str(ex)
 
         # setting file name for snapshot
-        addr = str(datetime.now())
-        addr = addr + '-' + str(uuid.uuid4())[:5]
-        path = 'trafficSnaps/' + addr + '.png'
-        driver.save_screenshot(path)
+        addr = str(uuid.uuid4())[:10]
+        dir_path = os.path.dirname(os.path.realpath(__file__))
+        path = dir_path + '/trafficSnaps/' + addr + '.png'
+        print(driver.save_screenshot(path))
         driver.quit()
         return path
