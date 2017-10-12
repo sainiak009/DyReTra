@@ -1,4 +1,4 @@
-from models.connection import Db
+from .connection import Db
 
 
 class TrafficCluster(Db):
@@ -22,13 +22,7 @@ class TrafficCluster(Db):
             }
         }
         if self.coll_name not in self.db.collection_names():
-            self.create_collection(self.coll_name, validator={
-                    "validator": {
-                        {"cluster_id": {"$type": "string"}},
-                        {"roads": {"$type": "array"}}
-                    },
-                    "validation_action": "error"
-                })
+            self.db.create_collection(self.coll_name)
         if cluster_id:
             cursor = self.db[self.coll_name].find({"cluster_id": int(cluster_id)})
             for c in cursor:
@@ -37,7 +31,7 @@ class TrafficCluster(Db):
                 self._exists = True
 
     def _validateData(self, data):
-        if data["approach_fl"] == 0 and data["traffic_signal"] != []:
+        if data["approach_fl"] == 0 and data["traffic_signal"] != {}:
             return False
         return True
 
@@ -47,9 +41,18 @@ class TrafficCluster(Db):
             "approach_fl": None,
             "slope": None,
             "cv_coord": [],
-            "traffic_signal": []
+            "traffic_signal": {}
         }
         return road_dict
+
+    def getTrafficLights(self):
+        all_signals = []
+        for road in self._schema['roads']:
+            if road['approach_fl'] == 1:
+                all_signals.append({
+                    "tl_id": road['traffic_signal']['id']
+                })
+        return all_signals
 
     def exists(self):
         return self._exists
@@ -72,7 +75,8 @@ class TrafficCluster(Db):
         return data['cluster_id']
 
     def create(self, data):
-        if self._validateData(data):
+        # if self._validateData(data):
+        if True: # TODO
             self.db[self.coll_name].insert_one(data)
             return data['cluster_id']
         return False

@@ -24,10 +24,10 @@ def _simulateTrafficDensity(cluster_id):
     cluster = TrafficCluster(cluster_id=cluster_id)
     tl_density = {}
     if cluster.exists():
-        cluster_data = cluster.get()
-        if cluster_data['traffic_signals']:
-            for tl_id in cluster_data['traffic_signals']:
-                tl_density[tl_id] = randint(2, 5) / 100
+        traffic_lights_data = cluster.getTrafficLights()
+        if traffic_lights_data:
+            for tl in traffic_lights_data:
+                tl_density[tl["tl_id"]] = randint(2, 5) / 100
         else:
             raise "Cluster with no traffic signals"
     else:
@@ -76,8 +76,8 @@ def simulateCluster(cluster_id=None, job_id=None):
 
     cluster = TrafficCluster(cluster_id=cluster_id)
     if cluster.exists():
-        cluster_data = cluster.get()
-        if cluster_data['traffic_signals']:
+        traffic_lights_data = cluster.getTrafficLights()
+        if traffic_lights_data:
             tl_signal = _calculateTime(cluster_id)
             scheduleEvent(cluster_id, tl_signal[0], tl_signal[1])
         else:

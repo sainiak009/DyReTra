@@ -1,3 +1,4 @@
+import time
 from datetime import datetime
 from flask import request
 from flask_socketio import SocketIO, emit, join_room
@@ -78,6 +79,27 @@ def joinTrafficCluster(data):
          room=cluster_id,
          namespace='/tl')
 
+@socketio.on('get-nearby-clusters', namespace="/tl")
+def getNearbyCluster(data):
+    """
+        To fetch nearby cluster for EVs
+        Args
+            data - (dictionary)
+                    ev_id   - (string) EV id
+                    lat     - (float) latitude
+                    lon     - (float) longitude
+        Emits
+            get-nearby-clusters - Dictionary of all cluster lying within the perimeter
+    """
+    sid = request.sid
+    ev_id = request.get('ev_id', None)
+    lat = request.get('lat', None)
+    lon = request.get('lon', None)
+    if lat and lon and ev_id:
+        clusters = getEVClusters(lat, lon)
+    else:
+        data = {"code": -1, "message": "Invalid input"}
+    emit('get-nearby-clusters', "data": data, "timestamp": int(time.time()))
 
 def emit_state(cluster_id, tl_signal, total_time, timestamp):
     """
