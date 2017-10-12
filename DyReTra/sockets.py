@@ -99,7 +99,7 @@ def getNearbyCluster(data):
         clusters = getEVClusters(lat, lon)
     else:
         data = {"code": -1, "message": "Invalid input"}
-    emit('get-nearby-clusters', "data": data, "timestamp": int(time.time()))
+    emit('get-nearby-clusters', {"data": data, "timestamp": int(time.time())})
 
 def emit_state(cluster_id, tl_signal, total_time, timestamp):
     """
