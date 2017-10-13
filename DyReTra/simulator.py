@@ -4,8 +4,22 @@ from datetime import datetime
 
 from models.trafficCluster import TrafficCluster
 from sockets import emit_state
+from utils import getRoadSlope
 from models.allJobs import AllJobs
 from models.trafficSignalData import TrafficSignalData
+from api import getSnap
+from image import getTrafficData
+
+
+def _densityMap(color_code):
+    map = {
+        -1: 0,
+        0: 0,
+        1: 3,
+        2: 7,
+        3: 10
+    }
+    return map[color_code]
 
 
 def _simulateTrafficDensity(cluster_id):
@@ -25,14 +39,12 @@ def _simulateTrafficDensity(cluster_id):
     tl_density = {}
     if cluster.exists():
         cluster_data = cluster.get()
-        if cluster_data['traffic_signals']:
-            for tl_id in cluster_data['traffic_signals']:
-                tl_density[tl_id] = randint(2, 5) / 100
-        else:
-            raise "Cluster with no traffic signals"
-    else:
-        raise "Cluster doesn't exists"
-
+        image_path = getSnap(cluster_data['coordinates']['lat'], cluster_data['coordinates']['lon'])
+        density_data = getTrafficData(cluster_data)
+        traffic_lights_data = cluster.getAllTrafficLights()
+        for i, j in enumerate(traffic_lights_data):
+            if j['approach_fl'] == 1:
+                tl_density[j["tl_id"]] = density_data[i]
     return tl_density
 
 
@@ -53,11 +65,11 @@ def _calculateTime(cluster_id):
     total_time = 0
     for i in sorted_cluster_density:
         temp = {}
-        green_time = int(i[1] * 100)
+        green_time = 10
         temp['tl_id'] = i[0]
-        temp['timer'] = green_time
+        temp['timer'] = green_time + _densityMap(i[1])
+        total_time += temp['timer']
         traffic_signals.append(temp)
-        total_time += green_time
     return traffic_signals, total_time
 
 
@@ -76,8 +88,8 @@ def simulateCluster(cluster_id=None, job_id=None):
 
     cluster = TrafficCluster(cluster_id=cluster_id)
     if cluster.exists():
-        cluster_data = cluster.get()
-        if cluster_data['traffic_signals']:
+        traffic_lights_data = cluster.getTrafficLights()
+        if traffic_lights_data:
             tl_signal = _calculateTime(cluster_id)
             scheduleEvent(cluster_id, tl_signal[0], tl_signal[1])
         else:
@@ -117,8 +129,20 @@ def createCluster(cluster_data):
 
 
 def scheduleEvent(cluster_id, tl_signal, total_time):
-    # TODO: Add data to Traffic Signal Collection
     time_now = datetime.now()
     ts = TrafficSignalData()
     ts.create({"cluster_id": cluster_id, "traffic_signals": tl_signal, "timestamp": int(time_now.timestamp())})
     emit_state(cluster_id, tl_signal, total_time, int(time_now.timestamp()))
+
+
+def changeClusterStatusforEV(cluster_id, lat, lon):
+    cluster = TrafficCluster(cluster_id)
+    cluster_signal_data = TrafficSignalData(cluster_id)
+    if cluster.exists():
+        traffic_lights_data = cluster.getTrafficLights()
+        if traffic_lights_data:
+            for tl in traffic_lights_data:
+                if tl['slope'] == getRoadSlope(cluster['coordinates']['lat'], cluster['coordinates']['lon'], lat, lon):
+                    break
+    else:
+        pass

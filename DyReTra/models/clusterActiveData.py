@@ -1,4 +1,4 @@
-from models.connection import Db
+from .connection import Db
 
 
 class ClusterActiveData(Db):

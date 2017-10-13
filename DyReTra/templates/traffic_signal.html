@@ -48,8 +48,8 @@
 		}
 
 		#log {
-			height: 280px;	
-			max-height: 280px;	
+			height: 280px;
+			max-height: 280px;
 			overflow-y: scroll;
 		}
 
@@ -117,7 +117,7 @@
 						Logs
 					</div>
 					<div class="card-body" id="log">
-						
+
 					</div>
 				</div>
 			</div>
@@ -127,7 +127,7 @@
 						Traffic Lights (JOIN Cluster to view TL)
 					</div>
 					<div class="card-body" id="cluster_view">
-						
+
 					</div>
 				</div>
 			</div>
@@ -263,8 +263,9 @@
 			});
 
 			socket.on('join-cluster-response', function (data) {
+				console.log(data);
 				$('#log').append('<p>'+ data.message + '</p>');
-				traffic_signals = data.cluster_data.traffic_signals
+				traffic_signals = data.cluster_data;
 				populateTL();
 			});
 

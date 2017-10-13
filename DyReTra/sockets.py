@@ -1,3 +1,4 @@
+import time
 from datetime import datetime
 from flask import request
 from flask_socketio import SocketIO, emit, join_room
@@ -63,6 +64,8 @@ def joinTrafficCluster(data):
         s.create({"cluster_id": cluster_id, "tl_id": tl_id, "sid": sid, "timestamp": datetime.now().timestamp(), "status": 1})
     join_room(cluster_id)
     cluster = TrafficCluster(cluster_id)
+    traffic_signals = cluster.getTrafficLights()
+    ts = [i['tl_id'] for i in traffic_signals]
     cluster_data = cluster.get()
     del cluster_data['_id']
     c = ClusterActiveData(cluster_id)
@@ -70,7 +73,7 @@ def joinTrafficCluster(data):
         c.increment()
     else:
         c.create({"cluster_id": cluster_id, "alive_connection": 1, "simulator_tl_id": tl_id, "timestamp": datetime.now().timestamp()})
-    emit('join-cluster-response', {"message": tl_id + " Joined Cluster " + cluster_id, "cluster_data": cluster_data}, room=cluster_id)
+    emit('join-cluster-response', {"message": tl_id + " Joined Cluster " + cluster_id, "cluster_data": ts}, room=cluster_id)
     cluster_signal = TrafficSignalData(cluster_id)
     cluster_signal_data = cluster_signal.get()
     emit('simulate-cluster-response',
@@ -78,6 +81,27 @@ def joinTrafficCluster(data):
          room=cluster_id,
          namespace='/tl')
 
+@socketio.on('get-nearby-clusters', namespace="/tl")
+def getNearbyCluster(data):
+    """
+        To fetch nearby cluster for EVs
+        Args
+            data - (dictionary)
+                    ev_id   - (string) EV id
+                    lat     - (float) latitude
+                    lon     - (float) longitude
+        Emits
+            get-nearby-clusters - Dictionary of all cluster lying within the perimeter
+    """
+    sid = request.sid
+    ev_id = request.get('ev_id', None)
+    lat = request.get('lat', None)
+    lon = request.get('lon', None)
+    if lat and lon and ev_id:
+        clusters = getEVClusters(lat, lon)
+    else:
+        data = {"code": -1, "message": "Invalid input"}
+    emit('get-nearby-clusters', {"data": data, "timestamp": int(time.time())})
 
 def emit_state(cluster_id, tl_signal, total_time, timestamp):
     """
