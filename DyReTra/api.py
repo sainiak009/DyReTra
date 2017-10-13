@@ -34,9 +34,7 @@ class getDirectionsEV(Resource):
         destination = str(args['destination_lat']) + ',' + str(args['destination_lng'])
         directions = gmaps.directions(origin, destination, departure_time=now)
         return directions
-
-#  API ot get traffic lights locations data (To be developed later after getting actual sufficient data)
-
+        
 
 # API to get snapshot of traffic junction
 class getMapSnap(Resource):

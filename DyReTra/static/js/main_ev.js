@@ -11,13 +11,12 @@ $("#setOrigin").click(function() {
 
 // API Call to get traffic signals location data of given locality and make server aware of our movement
 $("#sendDest").click(function() {
-    //   	$.post( "getDirectionsEV",
-    //   	{ origin_lat: $("#ev_lat").val(), origin_lng: $("#ev_lon").val(),
-    //   	destination_lat: $("#lat").val(), destination_lng: $("#lng").val()},
-    //   	function( data ) {
-    // 			console.log(data);
-    // 			initMap($("#ev_lat").val(), $("#ev_lon").val(), $("#lat").val(), $("#lng").val());
-    // }, "json");
+      	$.post( "getNearbyCluster",
+      	{ lat: $("#lat").val(), lng: $("#lng").val(), ev_id: 1}, // Sending destination coordinates and EV ID
+      	function( data ) {
+    			console.log(data);
+    			// initMap($("#ev_lat").val(), $("#ev_lon").val(), $("#lat").val(), $("#lng").val());
+    }, "json");
     initMap($("#ev_lat").val(), $("#ev_lon").val(), $("#lat").val(), $("#lng").val());
 });
 
