@@ -13,7 +13,7 @@ if __name__ == "__main__":
     			"road_id": "r1",
             	"approach_fl": 1,
             	"slope": 1.2564997159795548,
-            	"cv_coord": [],
+            	"cv_coord": [619, 299, 1032, 299],
             	"traffic_signal": {
             		"id": "tl1"
             	}
@@ -22,7 +22,7 @@ if __name__ == "__main__":
     			"road_id": "r2",
             	"approach_fl": 1,
             	"slope": -1.943558811423054,
-            	"cv_coord": [],
+            	"cv_coord": [660, 316, 1001, 316],
             	"traffic_signal": {
             		"id": "tl2"
             	}
@@ -31,7 +31,7 @@ if __name__ == "__main__":
     			"road_id": "r3",
             	"approach_fl": 1,
             	"slope": 2.891439025559257,
-            	"cv_coord": [],
+            	"cv_coord": [636, 587, 665, 311],
             	"traffic_signal": {
             		"id": "tl3"
             	}
@@ -40,7 +40,7 @@ if __name__ == "__main__":
     			"road_id": "r4",
             	"approach_fl": 1,
             	"slope": -0.2788820981381136,
-            	"cv_coord": [],
+            	"cv_coord": [569, 598, 585, 303],
             	"traffic_signal": {
             		"id": "tl4"
             	}
@@ -49,9 +49,36 @@ if __name__ == "__main__":
     			"road_id": "r94",
             	"approach_fl":0,
             	"slope": None,
-            	"cv_coord": [],
+            	"cv_coord": [57, 265, 591, 312],
             	"traffic_signal": {
             		"id": "tl94"
+            	}
+    		},
+    		{
+    			"road_id": "r95",
+            	"approach_fl":0,
+            	"slope": None,
+            	"cv_coord": [55, 240, 593, 296],
+            	"traffic_signal": {
+            		"id": "tl95"
+            	}
+    		},
+    		{
+    			"road_id": "r96",
+            	"approach_fl":0,
+            	"slope": None,
+            	"cv_coord": [584, 301, 604, 19],
+            	"traffic_signal": {
+            		"id": "tl96"
+            	}
+    		},
+    		{
+    			"road_id": "r97",
+            	"approach_fl":0,
+            	"slope": None,
+            	"cv_coord": [668, 308, 668, 44],
+            	"traffic_signal": {
+            		"id": "tl97"
             	}
     		}
     	]
