@@ -11,6 +11,17 @@ from api import getSnap
 from image import getTrafficData
 
 
+def _densityMap(color_code):
+    map = {
+        -1: 0,
+        0: 0,
+        1: 3,
+        2: 7,
+        3: 10
+    }
+    return map[color_code]
+
+
 def _simulateTrafficDensity(cluster_id):
     """
         Get Traffic Density for a cluster
@@ -50,16 +61,15 @@ def _calculateTime(cluster_id):
     """
     cluster_density = _simulateTrafficDensity(cluster_id)
     sorted_cluster_density = sorted(cluster_density.items(), key=operator.itemgetter(1), reverse=True)
-    print(sorted_cluster_density)
     traffic_signals = []
     total_time = 0
     for i in sorted_cluster_density:
         temp = {}
-        green_time = int(i[1] * 100)
+        green_time = 10
         temp['tl_id'] = i[0]
-        temp['timer'] = green_time
+        temp['timer'] = green_time + _densityMap(i[1])
+        total_time += temp['timer']
         traffic_signals.append(temp)
-        total_time += green_time
     return traffic_signals, total_time
 
 
@@ -136,6 +146,3 @@ def changeClusterStatusforEV(cluster_id, lat, lon):
                     break
     else:
         pass
-
-
-print(_calculateTime(123456))
