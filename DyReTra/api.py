@@ -25,6 +25,31 @@ MapTrafficParser.add_argument('latitude', type=float, required=True)
 MapTrafficParser.add_argument('longitude', type=float, required=True)
 
 
+def getSnap(lat, lon):
+    # Setting Proxy
+    PROXY = "172.16.2.30:8080"
+    chrome_options = webdriver.ChromeOptions()
+    chrome_options.add_argument('--proxy-server=%s' % PROXY)
+    chrome_options.add_argument('--proxy-bypass-list=%s' % "127.0.0.1*;localhost*")
+
+    # Browsing page
+    driver = webdriver.Chrome(chrome_options=chrome_options)
+    try:
+        driver.set_page_load_timeout(20)
+        request_url = 'https://sainiak009.github.io/DyReTra/trafficLayer?lat=' + str(lat) + '&lng=' + str(lon)
+        driver.get(request_url)
+    except TimeoutException as ex:
+        driver.close()
+        return "Exception has been thrown. " + str(ex)
+
+    # setting file name for snapshot
+    addr = str(uuid.uuid4())[:10]
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    path = dir_path + '/trafficSnaps/' + addr + '.png'
+    print(driver.save_screenshot(path))
+    driver.quit()
+    return path
+
 # API to get path for EVs
 class getDirectionsEV(Resource):
     def post(self):
@@ -41,26 +66,4 @@ class getMapSnap(Resource):
     def post(self):
         # Arguments parsing
         args = MapTrafficParser.parse_args()
-        # Setting Proxy
-        PROXY = "172.16.2.30:8080"
-        chrome_options = webdriver.ChromeOptions()
-        chrome_options.add_argument('--proxy-server=%s' % PROXY)
-        chrome_options.add_argument('--proxy-bypass-list=%s' % "127.0.0.1*;localhost*")
-
-        # Browsing page
-        driver = webdriver.Chrome(chrome_options=chrome_options)
-        try:
-            driver.set_page_load_timeout(20)
-            request_url = 'https://sainiak009.github.io/DyReTra/trafficLayer?lat=' + str(args['latitude']) + '&lng=' + str(args['longitude'])
-            driver.get(request_url)
-        except TimeoutException as ex:
-            driver.close()
-            return "Exception has been thrown. " + str(ex)
-
-        # setting file name for snapshot
-        addr = str(uuid.uuid4())[:10]
-        dir_path = os.path.dirname(os.path.realpath(__file__))
-        path = dir_path + '/trafficSnaps/' + addr + '.png'
-        print(driver.save_screenshot(path))
-        driver.quit()
-        return path
+        return getSnap(args['latitude'], args['longitude'])
