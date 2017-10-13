@@ -263,8 +263,9 @@
 			});
 
 			socket.on('join-cluster-response', function (data) {
+				console.log(data);
 				$('#log').append('<p>'+ data.message + '</p>');
-				traffic_signals = data.cluster_data.traffic_signals
+				traffic_signals = data.cluster_data;
 				populateTL();
 			});
 

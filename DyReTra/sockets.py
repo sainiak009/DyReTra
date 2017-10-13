@@ -64,6 +64,8 @@ def joinTrafficCluster(data):
         s.create({"cluster_id": cluster_id, "tl_id": tl_id, "sid": sid, "timestamp": datetime.now().timestamp(), "status": 1})
     join_room(cluster_id)
     cluster = TrafficCluster(cluster_id)
+    traffic_signals = cluster.getTrafficLights()
+    ts = [i['tl_id'] for i in traffic_signals]
     cluster_data = cluster.get()
     del cluster_data['_id']
     c = ClusterActiveData(cluster_id)
@@ -71,7 +73,7 @@ def joinTrafficCluster(data):
         c.increment()
     else:
         c.create({"cluster_id": cluster_id, "alive_connection": 1, "simulator_tl_id": tl_id, "timestamp": datetime.now().timestamp()})
-    emit('join-cluster-response', {"message": tl_id + " Joined Cluster " + cluster_id, "cluster_data": cluster_data}, room=cluster_id)
+    emit('join-cluster-response', {"message": tl_id + " Joined Cluster " + cluster_id, "cluster_data": ts}, room=cluster_id)
     cluster_signal = TrafficSignalData(cluster_id)
     cluster_signal_data = cluster_signal.get()
     emit('simulate-cluster-response',

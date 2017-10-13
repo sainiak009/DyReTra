@@ -1,6 +1,6 @@
 from config import app
 from sockets import run as start_socket
-from simulator import simulateCluster
+from simulator import simulateCluster, changeClusterStatusforEV
 from flask import render_template, request
 from flask_restful import Api
 from config_values import GOOGLE_KEY
@@ -46,6 +46,17 @@ def getNearbyCluster():
 		return {"code": 0, "data": getEVClusters(lat, lon), "message": "All nearby clusters"}
 	else:
 		return {"code": 0, "data": [], "message": "Invalid Input"}
+
+
+@app.route('/changeClusterStatus', methods=['POST', 'GET'])
+def changeClusterStatus():
+	cluster_id = request.get('cluster_id', None)
+	ev_id = request.get('ev_id', None)
+	lat = request.get('lat', None)
+	lon = request.get('lon', None)
+	if cluster_id and ev_id and lat and lon:
+		changeClusterStatusforEV(cluster_id, lat, lon)
+
 
 if __name__ == "__main__":
     start_socket()

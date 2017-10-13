@@ -4,6 +4,7 @@ from datetime import datetime
 
 from models.trafficCluster import TrafficCluster
 from sockets import emit_state
+from utils import getRoadSlope
 from models.allJobs import AllJobs
 from models.trafficSignalData import TrafficSignalData
 
@@ -117,8 +118,20 @@ def createCluster(cluster_data):
 
 
 def scheduleEvent(cluster_id, tl_signal, total_time):
-    # TODO: Add data to Traffic Signal Collection
     time_now = datetime.now()
     ts = TrafficSignalData()
     ts.create({"cluster_id": cluster_id, "traffic_signals": tl_signal, "timestamp": int(time_now.timestamp())})
     emit_state(cluster_id, tl_signal, total_time, int(time_now.timestamp()))
+
+
+def changeClusterStatusforEV(cluster_id, lat, lon):
+    cluster = TrafficCluster(cluster_id)
+    cluster_signal_data = TrafficSignalData(cluster_id)
+    if cluster.exists():
+        traffic_lights_data = cluster.getTrafficLights()
+        if traffic_lights_data:
+            for tl in traffic_lights_data:
+                if tl['slope'] == getRoadSlope(cluster['coordinates']['lat'], cluster['coordinates']['lon'], lat, lon):
+                    break
+    else:
+        pass
