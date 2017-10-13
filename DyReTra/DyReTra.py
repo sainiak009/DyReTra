@@ -6,6 +6,8 @@ from flask_restful import Api
 from config_values import GOOGLE_KEY
 from api import *
 
+import simplejson as json
+
 from utils import getEVClusters
 
 api = Api(app)
@@ -43,9 +45,9 @@ def getNearbyCluster():
 	lat = request.args.get('lat', None)
 	lon = request.args.get('lon', None)
 	if ev_id and lat and lon:
-		return str({"code": 0, "data": getEVClusters(float(lat), float(lon)), "message": "All nearby clusters"})
+		return json.dumps({"code": 0, "data": getEVClusters(float(lat), float(lon)), "message": "All nearby clusters"})
 	else:
-		return str({"code": 0, "data": [], "message": "Invalid Input"})
+		return json.dumps({"code": 0, "data": [], "message": "Invalid Input"})
 
 
 @app.route('/changeClusterStatus', methods=['POST', 'GET'])

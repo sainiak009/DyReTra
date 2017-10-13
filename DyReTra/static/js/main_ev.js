@@ -8,32 +8,30 @@ $("#setOrigin").click(function() {
     console.log("EV Origin set")
 });
 
+trafficLights = []; // To store traffic lights coordinates to be rendered
+var trafficLightsMarkers = []; // To store traffic light markers
 
 // API Call to get traffic signals location data of given locality and make server aware of our movement
 $("#sendDest").click(function() {
-      	$.post( "getNearbyCluster",
-      	{ lat: $("#lat").val(), lng: $("#lng").val(), ev_id: 1}, // Sending destination coordinates and EV ID
-      	function( data ) {
-    			console.log(data);
-    			// initMap($("#ev_lat").val(), $("#ev_lon").val(), $("#lat").val(), $("#lng").val());
-    }, "json");
+        console.log($("#ev_lat").val());
+        console.log($("#ev_lon").val());
+      	$.ajax({
+                    url: '/getNearbyCluster',
+                    type: 'GET',
+                    data: {lat: $("#ev_lat").val(), lon: $("#ev_lon").val(), ev_id: 1},
+                    success: function(response) {
+                        // var x = JSON.stringify(response);
+                        var res_json = JSON.parse(response);
+                        // console.log(res_json.data);
+                        res_json.data.forEach(function(item, index){
+                            trafficLights.push({lat: parseFloat(item.coordinates.lat), lng: parseFloat(item.coordinates.lon)});
+                            console.log(trafficLights);
+                        });
+                    }
+                });
     initMap($("#ev_lat").val(), $("#ev_lon").val(), $("#lat").val(), $("#lng").val());
 });
 
-
-var trafficLightsMarkers = [];
-var trafficLights = [ //Sample traffic lights data(To be provided by server)
-    {
-        lat: 22.562005,
-        lng: 88.408281
-    }, {
-        lat: 22.542975,
-        lng: 88.366504
-    }, {
-        lat: 22.540904,
-        lng: 88.341465
-    }
-];
 
 // Function to create markers on google maps 
 function createMarker(latlng, label, html) {
