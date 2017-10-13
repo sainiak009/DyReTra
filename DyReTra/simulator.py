@@ -7,6 +7,7 @@ from sockets import emit_state
 from utils import getRoadSlope
 from models.allJobs import AllJobs
 from models.trafficSignalData import TrafficSignalData
+from api import getSnap
 
 
 def _simulateTrafficDensity(cluster_id):
@@ -25,6 +26,8 @@ def _simulateTrafficDensity(cluster_id):
     cluster = TrafficCluster(cluster_id=cluster_id)
     tl_density = {}
     if cluster.exists():
+        cluster_data = cluster.get()
+        image_path = getSnap(cluster_data['coordinates']['lat'], cluster_data['coordinates']['lon'])
         traffic_lights_data = cluster.getTrafficLights()
         if traffic_lights_data:
             for tl in traffic_lights_data:
