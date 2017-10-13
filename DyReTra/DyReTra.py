@@ -51,13 +51,16 @@ def getNearbyCluster():
 
 
 @app.route('/changeClusterStatus', methods=['POST', 'GET'])
-def changeClusterStatus():
-	cluster_id = request.args.get('cluster_id', None)
-	ev_id = request.args.get('ev_id', None)
+def changeClusterStatus(): #Todo
 	lat = request.args.get('lat', None)
 	lon = request.args.get('lon', None)
-	if cluster_id and ev_id and lat and lon:
-		changeClusterStatusforEV(cluster_id, lat, lon)
+	ev_lat = request.args.get('ev_lat', None)
+	ev_lon = request.args.get('ev_lon', None)
+	cluster_id = 1
+	if cluster_id and ev_lat and ev_lon:
+		changeClusterStatusforEV(cluster_id, ev_lat, ev_lon)
+		return "1"
+	return "0"
 
 
 if __name__ == "__main__":

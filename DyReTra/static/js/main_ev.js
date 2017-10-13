@@ -13,20 +13,27 @@ var trafficLightsMarkers = []; // To store traffic light markers
 
 // API Call to get traffic signals location data of given locality and make server aware of our movement
 $("#sendDest").click(function() {
-        console.log($("#ev_lat").val());
-        console.log($("#ev_lon").val());
-      	$.ajax({
-                    url: '/getNearbyCluster',
-                    type: 'GET',
-                    data: {lat: $("#ev_lat").val(), lon: $("#ev_lon").val(), ev_id: 1},
-                    success: function(response) {
-                        var res_json = JSON.parse(response);
-                        res_json.data.forEach(function(item, index){
-                            trafficLights.push({lat: parseFloat(item.coordinates.lat), lng: parseFloat(item.coordinates.lon)});
-                            console.log(trafficLights);
-                        });
-                    }
+    console.log($("#ev_lat").val());
+    console.log($("#ev_lon").val());
+    $.ajax({
+        url: '/getNearbyCluster',
+        type: 'GET',
+        data: {
+            lat: $("#ev_lat").val(),
+            lon: $("#ev_lon").val(),
+            ev_id: 1
+        },
+        success: function(response) {
+            var res_json = JSON.parse(response);
+            res_json.data.forEach(function(item, index) {
+                trafficLights.push({
+                    lat: parseFloat(item.coordinates.lat),
+                    lng: parseFloat(item.coordinates.lon)
                 });
+                console.log(trafficLights);
+            });
+        }
+    });
     initMap($("#ev_lat").val(), $("#ev_lon").val(), $("#lat").val(), $("#lng").val());
 });
 
@@ -191,7 +198,7 @@ function initMap(EV_origin_lat = 0, EV_origin_lng = 0, EV_dest_lat = 0, EV_dest_
 
 
     google.maps.event.addDomListener(window, "load", initMap);
-    
+
 
     google.maps.LatLng.prototype.latRadians = function() {
         return this.lat() * Math.PI / 180;
@@ -250,7 +257,7 @@ function initMap(EV_origin_lat = 0, EV_origin_lng = 0, EV_dest_lat = 0, EV_dest_
 
 
 // To calculate and reder final path to be followed by Vehicle
-function calcRoute() {    
+function calcRoute() {
     directionsDisplay.setMap(null);
 
     // Creating poly lines variables for Vehicular Movement
@@ -368,7 +375,23 @@ function animate(d) {
     // IF IN RANGE THEN REQUEST TO MAKE THE SIGNAL WILL BE SENT TO SERVER
     try {
         trafficLightsMarkers.forEach(function(item, index) {
-            if (checkIfWithInDistance(polyline.GetPointAtDistance(d + 500).lat(), polyline.GetPointAtDistance(d + 500).lng(), trafficLights[index].lat, trafficLights[index].lng, 1)) item.setIcon('http://maps.google.com/mapfiles/ms/icons/green-dot.png');
+            if (checkIfWithInDistance(polyline.GetPointAtDistance(d + 500).lat(), polyline.GetPointAtDistance(d + 500).lng(), trafficLights[index].lat, trafficLights[index].lng, 1)) {
+                item.setIcon('http://maps.google.com/mapfiles/ms/icons/green-dot.png');
+                // Sending signal that EV is about to reach this cluster
+                $.ajax({
+                    url: '/changeClusterStatus',
+                    type: 'POST',
+                    data: {
+                        lat: trafficLights[index].lat,
+                        lon: trafficLights[index].lng,
+                        ev_lat: polyline.GetPointAtDistance(d).lat(),
+                        ev_lon: polyline.GetPointAtDistance(d).lng()
+                    },
+                    success: function(response) {
+                        console.log(response);
+                    }
+                });
+            }
         });
     } catch (err) {;
     }
