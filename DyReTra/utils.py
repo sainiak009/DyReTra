@@ -25,6 +25,6 @@ def getRoadSlope(lat1, lon1, lat2, lon2):
 	bearing = atan2(y, x)
 	return bearing
 
-def getEVClusters(lat, lon, radius=5):
+def getEVClusters(lat, lon, radius=10):
 	all_clusters = TrafficCluster().getAllNearby(lat, lon, radius)
 	return all_clusters

@@ -39,21 +39,21 @@ def EV_simulator():
 
 @app.route('/getNearbyCluster', methods=['POST', 'GET'])
 def getNearbyCluster():
-	ev_id = request.get('ev_id', None)
-	lat = request.get('lat', None)
-	lon = request.get('lon', None)
+	ev_id = request.args.get('ev_id', None)
+	lat = request.args.get('lat', None)
+	lon = request.args.get('lon', None)
 	if ev_id and lat and lon:
-		return {"code": 0, "data": getEVClusters(lat, lon), "message": "All nearby clusters"}
+		return str({"code": 0, "data": getEVClusters(float(lat), float(lon)), "message": "All nearby clusters"})
 	else:
-		return {"code": 0, "data": [], "message": "Invalid Input"}
+		return str({"code": 0, "data": [], "message": "Invalid Input"})
 
 
 @app.route('/changeClusterStatus', methods=['POST', 'GET'])
 def changeClusterStatus():
-	cluster_id = request.get('cluster_id', None)
-	ev_id = request.get('ev_id', None)
-	lat = request.get('lat', None)
-	lon = request.get('lon', None)
+	cluster_id = request.args.get('cluster_id', None)
+	ev_id = request.args.get('ev_id', None)
+	lat = request.args.get('lat', None)
+	lon = request.args.get('lon', None)
 	if cluster_id and ev_id and lat and lon:
 		changeClusterStatusforEV(cluster_id, lat, lon)
 
