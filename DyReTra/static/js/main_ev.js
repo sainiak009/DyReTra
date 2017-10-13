@@ -20,9 +20,7 @@ $("#sendDest").click(function() {
                     type: 'GET',
                     data: {lat: $("#ev_lat").val(), lon: $("#ev_lon").val(), ev_id: 1},
                     success: function(response) {
-                        // var x = JSON.stringify(response);
                         var res_json = JSON.parse(response);
-                        // console.log(res_json.data);
                         res_json.data.forEach(function(item, index){
                             trafficLights.push({lat: parseFloat(item.coordinates.lat), lng: parseFloat(item.coordinates.lon)});
                             console.log(trafficLights);
