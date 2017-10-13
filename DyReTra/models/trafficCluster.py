@@ -54,6 +54,15 @@ class TrafficCluster(Db):
                 })
         return all_signals
 
+    def getAllTrafficLights(self):
+        all_signals = []
+        for road in self._schema['roads']:
+            all_signals.append({
+                "tl_id": road['traffic_signal']['id'],
+                "approach_fl": road['approach_fl']
+            })
+        return all_signals
+
     def exists(self):
         return self._exists
 
@@ -87,14 +96,14 @@ class TrafficCluster(Db):
 
 
     def iswithinRange(self, lat1, lon1, lat2, lon2, radius):
-        # convert decimal degrees to radians 
+        # convert decimal degrees to radians
         lon1, lat1, lon2, lat2 = map(radians, [lon1, lat1, lon2, lat2])
 
-        # haversine formula 
-        dlon = lon2 - lon1 
-        dlat = lat2 - lat1 
+        # haversine formula
+        dlon = lon2 - lon1
+        dlat = lat2 - lat1
         a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
-        c = 2 * asin(sqrt(a)) 
+        c = 2 * asin(sqrt(a))
         r = 6371 # Radius of earth in kilometers. Use 3956 for miles
         if c*r <= radius:
             return True

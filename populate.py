@@ -4,14 +4,14 @@ if __name__ == "__main__":
     t = TrafficCluster()
     t.create({
     	'coordinates': {
-    		'lon': 22.5941398,
-            'lat': 88.3752314
+    		'lat': 22.5941398,
+            'lon': 88.3752314
     	},
     	'cluster_id': 123456,
     	'roads': [
     		{
     			"road_id": "r1",
-            	"approach_fl": 1,
+            	"approach_fl": 0,
             	"slope": 1.2564997159795548,
             	"cv_coord": [619, 299, 1032, 299],
             	"traffic_signal": {
@@ -29,7 +29,7 @@ if __name__ == "__main__":
     		},
     		{
     			"road_id": "r3",
-            	"approach_fl": 1,
+            	"approach_fl": 0,
             	"slope": 2.891439025559257,
             	"cv_coord": [636, 587, 665, 311],
             	"traffic_signal": {
@@ -56,7 +56,7 @@ if __name__ == "__main__":
     		},
     		{
     			"road_id": "r95",
-            	"approach_fl":0,
+            	"approach_fl":1,
             	"slope": None,
             	"cv_coord": [55, 240, 593, 296],
             	"traffic_signal": {
@@ -74,7 +74,7 @@ if __name__ == "__main__":
     		},
     		{
     			"road_id": "r97",
-            	"approach_fl":0,
+            	"approach_fl":1,
             	"slope": None,
             	"cv_coord": [668, 308, 668, 44],
             	"traffic_signal": {

@@ -45,10 +45,11 @@ def getSnap(lat, lon):
     # setting file name for snapshot
     addr = str(uuid.uuid4())[:10]
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    path = dir_path + '/trafficSnaps/' + addr + '.png'
+    filename = addr + '.png'
+    path = dir_path + '/trafficSnaps/' + filename
     print(driver.save_screenshot(path))
     driver.quit()
-    return path
+    return filename
 
 # API to get path for EVs
 class getDirectionsEV(Resource):
@@ -59,7 +60,7 @@ class getDirectionsEV(Resource):
         destination = str(args['destination_lat']) + ',' + str(args['destination_lng'])
         directions = gmaps.directions(origin, destination, departure_time=now)
         return directions
-        
+
 
 # API to get snapshot of traffic junction
 class getMapSnap(Resource):

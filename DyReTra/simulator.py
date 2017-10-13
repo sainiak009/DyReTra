@@ -29,19 +29,12 @@ def _simulateTrafficDensity(cluster_id):
     if cluster.exists():
         cluster_data = cluster.get()
         image_path = getSnap(cluster_data['coordinates']['lat'], cluster_data['coordinates']['lon'])
-        print(image_path)
-        traffic_data = getTrafficData(image_path)
-        traffic_lights_data = cluster.getTrafficLights()
-        print(traffic_lights_data)
-
-        #     if traffic_lights_data:
-        #         for tl in traffic_lights_data:
-        #             tl_density[tl["tl_id"]] = randint(2, 5) / 100
-        #     else:
-        #         raise "Cluster with no traffic signals"
-        # else:
-        #     raise "Cluster doesn't exists"
-    return True #tl_density
+        density_data = getTrafficData(cluster_data)
+        traffic_lights_data = cluster.getAllTrafficLights()
+        for i, j in enumerate(traffic_lights_data):
+            if j['approach_fl'] == 1:
+                tl_density[j["tl_id"]] = density_data[i]
+    return tl_density
 
 
 def _calculateTime(cluster_id):
@@ -57,6 +50,7 @@ def _calculateTime(cluster_id):
     """
     cluster_density = _simulateTrafficDensity(cluster_id)
     sorted_cluster_density = sorted(cluster_density.items(), key=operator.itemgetter(1), reverse=True)
+    print(sorted_cluster_density)
     traffic_signals = []
     total_time = 0
     for i in sorted_cluster_density:
@@ -144,4 +138,4 @@ def changeClusterStatusforEV(cluster_id, lat, lon):
         pass
 
 
-print(_simulateTrafficDensity(123456))
+print(_calculateTime(123456))
