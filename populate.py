@@ -4,8 +4,8 @@ if __name__ == "__main__":
     t = TrafficCluster()
     t.create({
     	'coordinates': {
-    		'lon': 12.979268,
-            'lat': 77.602457
+    		'lon': 22.5941398,
+            'lat': 88.3752314
     	},
     	'cluster_id': 123456,
     	'roads': [
