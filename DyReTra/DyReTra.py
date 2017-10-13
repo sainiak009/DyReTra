@@ -6,6 +6,8 @@ from flask_restful import Api
 from config_values import GOOGLE_KEY
 from api import *
 
+from utils import getEVClusters
+
 api = Api(app)
 
 # All Api routes will go here
@@ -21,7 +23,6 @@ def traffic_signal():
 
 @app.route('/start_cluster_simulation', methods=['POST', 'GET'])
 def start_cluster_simulator():
-    print(request.args.get('cluster_id', None))
     simulateCluster(cluster_id=request.args.get('cluster_id', None))
     return request.args.get('cluster_id', 'Hola')
 
@@ -35,6 +36,16 @@ def traffic_snap(lat, lon):
 def EV_simulator():
     return render_template('ev_simulation.html', GOOGLE_KEY=GOOGLE_KEY)
 
+
+@app.route('/getNearbyCluster', methods=['POST', 'GET'])
+def getNearbyCluster():
+	ev_id = request.get('ev_id', None)
+	lat = request.get('lat', None)
+	lon = request.get('lon', None)
+	if ev_id and lat and lon:
+		return {"code": 0, "data": getEVClusters(lat, lon), "message": "All nearby clusters"}
+	else:
+		return {"code": 0, "data": [], "message": "Invalid Input"}
 
 if __name__ == "__main__":
     start_socket()
