@@ -34,63 +34,64 @@ for color in colors :
     # cv2.destroyAllWindows()
 
     gray = cv2.cvtColor(res,cv2.COLOR_BGR2GRAY)
-    minLineLength = 30
+    minLineLength = 50
     maxLineGap = 50
-    lines = cv2.HoughLinesP(gray,5,np.pi/180,1000, minLineLength = minLineLength, maxLineGap = maxLineGap)
+    lines = cv2.HoughLinesP(gray,5,np.pi/180,500, minLineLength = minLineLength, maxLineGap = maxLineGap)
     for linest in lines:
         for x1,y1,x2,y2 in linest:
             cv2.line(frame,(x1,y1),(x2,y2),(0,255,255),2)
-    cv2.imshow('snapshot', frame)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-    snapshot_res.append(lines)
+
+cv2.imshow('snapshot', frame)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+snapshot_res.append(lines)
 
 print(snapshot_res)
-
-for (road1, road2) in roads :
-
-    if road1[0]-road1[2] == 0:
-        road1_th = 90
-        road1_d = road1[0]
-    else:
-        road1_m = ((road1[1]-road1[3])/(road1[0]-road1[2]))
-        road1_th = math.degrees(math.atan(road1_m))
-        road1_d = (road1_m*road1[0] - road1[1])/math.sqrt(road1_m**2 + 1)
-
-    if road2[0]-road2[2] == 0:
-        road2_th = 90
-        road2_d = road2[0]
-    else:
-        road2_m = ((road2[1]-road2[3])/(road2[0]-road2[2]))
-        road2_th = math.degrees(math.atan(road2_m))
-        road2_d = (road2_m*road2[0] - road2[1])/math.sqrt(road2_m**2 + 1)
-
-    road1_sig = -1
-    road2_sig = -1
-
-    for color_i in range(0, len(snapshot_res)) :
-        road_data_temp = []
-        for cv_temp in snapshot_res[color_i] :
-            cv_road = cv_temp[0]
-
-            if cv_road[0]-cv_road[2] == 0:
-                cv_road_th = 90
-                cv_road_d = cv_road[0]
-            else:
-                cv_road_m = ((cv_road[1]-cv_road[3])/(cv_road[0]-cv_road[2]))
-                cv_road_th = math.degrees(math.atan(cv_road_m))
-                cv_road_d = (cv_road_m*cv_road[0] - cv_road[1])/math.sqrt(cv_road_m**2 + 1)
-
-                try:
-                    print(str(math.fabs(cv_road_th - road1_th)) + " and "+ str(math.fabs(cv_road_d - road1_d)))
-                except Exception as e:
-                    print("fail")
-
-            if math.fabs(cv_road_th - road1_th) < 5.0 and math.fabs(cv_road_d - road1_d) < 1.0 :
-                road1_sig = color_i
-            if math.fabs(cv_road_th - road2_th) < 5.0 and math.fabs(cv_road_d - road2_d) < 1.0 :
-                road2_sig = color_i
-    road_data_temp.append(road1_sig)
-    road_data_temp.append(road2_sig)
-    road_data.append(road_data_temp)
-print(road_data)
+#
+# for (road1, road2) in roads :
+#
+#     if road1[0]-road1[2] == 0:
+#         road1_th = 90
+#         road1_d = road1[0]
+#     else:
+#         road1_m = ((road1[1]-road1[3])/(road1[0]-road1[2]))
+#         road1_th = math.degrees(math.atan(road1_m))
+#         road1_d = (road1_m*road1[0] - road1[1])/math.sqrt(road1_m**2 + 1)
+#
+#     if road2[0]-road2[2] == 0:
+#         road2_th = 90
+#         road2_d = road2[0]
+#     else:
+#         road2_m = ((road2[1]-road2[3])/(road2[0]-road2[2]))
+#         road2_th = math.degrees(math.atan(road2_m))
+#         road2_d = (road2_m*road2[0] - road2[1])/math.sqrt(road2_m**2 + 1)
+#
+#     road1_sig = -1
+#     road2_sig = -1
+#
+#     for color_i in range(0, len(snapshot_res)) :
+#         road_data_temp = []
+#         for cv_temp in snapshot_res[color_i] :
+#             cv_road = cv_temp[0]
+#
+#             if cv_road[0]-cv_road[2] == 0:
+#                 cv_road_th = 90
+#                 cv_road_d = cv_road[0]
+#             else:
+#                 cv_road_m = ((cv_road[1]-cv_road[3])/(cv_road[0]-cv_road[2]))
+#                 cv_road_th = math.degrees(math.atan(cv_road_m))
+#                 cv_road_d = (cv_road_m*cv_road[0] - cv_road[1])/math.sqrt(cv_road_m**2 + 1)
+#
+#                 try:
+#                     print(str(math.fabs(cv_road_th - road1_th)) + " and "+ str(math.fabs(cv_road_d - road1_d)))
+#                 except Exception as e:
+#                     print("fail")
+#
+#             if math.fabs(cv_road_th - road1_th) < 5.0 and math.fabs(cv_road_d - road1_d) < 1.0 :
+#                 road1_sig = color_i
+#             if math.fabs(cv_road_th - road2_th) < 5.0 and math.fabs(cv_road_d - road2_d) < 1.0 :
+#                 road2_sig = color_i
+#     road_data_temp.append(road1_sig)
+#     road_data_temp.append(road2_sig)
+#     road_data.append(road_data_temp)
+# print(road_data)
