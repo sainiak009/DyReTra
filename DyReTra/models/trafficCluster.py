@@ -1,5 +1,5 @@
 from .connection import Db
-
+from math import radians, sin, cos, asin, acos, atan2, sqrt
 
 class TrafficCluster(Db):
     """
@@ -18,7 +18,7 @@ class TrafficCluster(Db):
             "roads": [],  # List having TL ids
             "coordinates": {
                 "lat": None,
-                "long": None
+                "lon": None
             }
         }
         if self.coll_name not in self.db.collection_names():
@@ -84,3 +84,33 @@ class TrafficCluster(Db):
     def createMany(self, data):
         self.db[self.coll_name].insert_many(data)
         return True  # TODO: Change this to return cluster_ids
+
+
+    def iswithinRange(self, lat1, lon1, lat2, lon2, radius):
+        # convert decimal degrees to radians 
+        lon1, lat1, lon2, lat2 = map(radians, [lon1, lat1, lon2, lat2])
+
+        # haversine formula 
+        dlon = lon2 - lon1 
+        dlat = lat2 - lat1 
+        a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
+        c = 2 * asin(sqrt(a)) 
+        r = 6371 # Radius of earth in kilometers. Use 3956 for miles
+        if c*r <= radius:
+            return True
+        else:
+            return False
+
+
+    def getAllNearby(self, lat, lon, radius=5):
+        all_nearby = []
+        for i in self.db[self.coll_name].find():
+            if self.iswithinRange(lat, lon, i["coordinates"]["lat"], i["coordinates"]["lon"], radius):
+                all_nearby.append({
+                    "cluster_id": i['cluster_id'],
+                    "coordinates": {
+                        "lat": i["coordinates"]["lat"],
+                        "lon": i["coordinates"]["lon"]
+                    }
+                })
+        return all_nearby

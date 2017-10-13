@@ -1,8 +1,5 @@
-import math
+from math import radians, sin, cos, asin, acos, atan2, sqrt
 from models.trafficCluster import TrafficCluster
-
-def iswithinRange():
-	pass
 
 def getReferenceLatLon():
 	"""
@@ -22,16 +19,12 @@ def getRoadSlope(lat1, lon1, lat2, lon2):
 	"""
 	# ref = getReferenceLatLon():
 	dlon = (lon1 - lon2)
-	y = math.sin(dlon) * math.cos(lat2)
-	x = math.cos(lat1) * math.sin(lat2) - math.sin(lat1) * math.cos(lat2) * math.cos(dlon)
+	y = sin(dlon) * cos(lat2)
+	x = cos(lat1) * sin(lat2) - sin(lat1) * cos(lat2) * cos(dlon)
 
-	bearing = math.atan2(y, x)
+	bearing = atan2(y, x)
 	return bearing
 
-def getEVClusters(lat, lon):
-	pass
-
-print(getRoadSlope(12.979268, 77.602457, 12.979490, 77.601711))
-print(getRoadSlope(12.979268, 77.602457, 12.978925, 77.603414))
-print(getRoadSlope(12.979268, 77.602457, 12.978766, 77.602317))
-print(getRoadSlope(12.979268, 77.602457, 12.979882, 77.602649))
+def getEVClusters(lat, lon, radius=5):
+	all_clusters = TrafficCluster().getAllNearby(lat, lon, radius)
+	return all_clusters

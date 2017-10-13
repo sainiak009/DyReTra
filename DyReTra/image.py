@@ -14,7 +14,7 @@ with open('node_config.json') as json_file:
     roads = json.load(json_file)['roads']
 
 
-snapshot = cv2.imread("trafficSnaps/traffic3.png", -1)
+snapshot = cv2.imread("trafficSnaps/traffic2.png", -1)
 snapshot_hsv = cv2.cvtColor(snapshot, cv2.COLOR_BGR2HSV)
 snapshot_res = []
 road_data = []
