@@ -6,8 +6,13 @@ Urban population in India is on a rise, and the time is not far away in the futu
 ## Built With
 
 * [Flask](http://flask.pocoo.org/) - The python web framework used
+* [Flask-RESTful](http://flask-restful.readthedocs.io/en/latest/) - Flask extention for building RESTful APIs
+* [Flask-SocketIO](https://flask-socketio.readthedocs.io/en/latest/) - Low latency bi-directional communications between the clients and the server
 * [googlemaps](https://github.com/googlemaps/google-maps-services-python) - Python client library for Google Maps API Web Services
-* [Flask-RESTful](http://flask-restful.readthedocs.io/en/latest/) - Flask extention for building RESTful APIs 
+* [Maps JavaScript API](https://developers.google.com/maps/documentation/javascript/) - API to render maps on frontend
+* [OpenCV-Python](https://opencv-python-tutroals.readthedocs.io/en/latest/) - Python wrapper for the original OpenCV 
+* [Selenium-Python](http://selenium-python.readthedocs.io/) - Headless browser
+* [MongoDB](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/) - NoSQL database
 
 ## To run development server
 ### Install virtualenv
