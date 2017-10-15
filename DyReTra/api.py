@@ -32,8 +32,12 @@ def getSnap(lat, lon):
     chrome_options.add_argument('--proxy-server=%s' % PROXY)
     chrome_options.add_argument('--proxy-bypass-list=%s' % "127.0.0.1*;localhost*")
 
+    # Adding "chromedriver" to PATH
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    chromedriver = dir_path + '/chromedriver'
+
     # Browsing page
-    driver = webdriver.Chrome(chrome_options=chrome_options)
+    driver = webdriver.Chrome(executable_path=chromedriver , chrome_options=chrome_options)
     try:
         driver.set_page_load_timeout(20)
         request_url = 'https://sainiak009.github.io/DyReTra/trafficLayer?lat=' + str(lat) + '&lng=' + str(lon)
@@ -44,10 +48,9 @@ def getSnap(lat, lon):
 
     # setting file name for snapshot
     addr = str(uuid.uuid4())[:10]
-    dir_path = os.path.dirname(os.path.realpath(__file__))
     filename = addr + '.png'
     path = dir_path + '/trafficSnaps/' + filename
-    print(driver.save_screenshot(path))
+    driver.save_screenshot(path)
     driver.quit()
     return filename
 
