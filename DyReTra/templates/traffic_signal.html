@@ -26,6 +26,7 @@
 			border: 1px solid grey;
 			border-radius: 5px;
 			margin-left: 10px;
+			margin-right: 25px;
 			text-align: center;
 		}
 		.light {
@@ -70,6 +71,10 @@
 			height: 520px;
 		}
 
+		#map_image {
+			width: 100%;
+		}
+
 	</style>
 </head>
 <body>
@@ -86,48 +91,48 @@
 			</ul>
 		</div>
 	</nav>
-	<div class="container">
+	<div class="container-fluid">
 		<div class="row">
-			<div class="col-md-6">
-				<div class="card">
-					<div class="card-header">
-						Simulator
+			<div class="col-md-8">
+				<div class="card text-center">
+					<div class="card-body">
+						<img id="map_image" src="{{ url_for('static', filename='img/default.png') }}" />
 					</div>
+				</div>
+			</div>
+			<div class="col-md-4">
+				<div class="card">
 					<div class="card-body">
 						<div class="form">
 							<div class="row">
-								<div class="col-md-12">
-									<input class="form-control" type="text" id="cluster_id" placeholder="Cluster ID" />
-								</div>
 								<div class="col-md-6">
-									<input class="form-control" type="text" id="tl_id" placeholder="Traffic Light ID" />
+									<input class="form-control" type="text" id="cluster_id" placeholder="Cluster ID" />
 								</div>
 								<div class="col-md-6">
 									<button class="form-control btn btn-primary" id="join">JOIN</button>
 								</div>
-								<div class="col-md-12">
+								<div class="col-md-6">
 									<button class="form-control btn btn-primary" id="simulate">SIMULATE</button>
+								</div>
+								<div class="col-md-6">
+									<button class="form-control btn btn-primary" id="override">OVERRIDE</button>
 								</div>
 							</div>
 						</div>
-					</div>
-				</div>
-				<div class="card">
-					<div class="card-header">
-						Logs
-					</div>
-					<div class="card-body" id="log">
-
+						<br />
+						<div id="cluster_view">
+						</div>
 					</div>
 				</div>
 			</div>
-			<div class="col-md-6">
+		</div>
+		<div class="row">
+			<div class="col-md-12">
 				<div class="card">
 					<div class="card-header">
-						Traffic Lights (JOIN Cluster to view TL)
+						Log
 					</div>
-					<div class="card-body" id="cluster_view">
-
+					<div id="log" class="card-body">
 					</div>
 				</div>
 			</div>
@@ -172,6 +177,7 @@
 			var total_no_of_cycles = null;
 			var current_cycle = 0;
 			var simulation_running = false;
+			var timer_data = {};
 
 			var socket = io.connect('http://' + document.domain + ':' + location.port + '/tl');
 
@@ -182,7 +188,9 @@
 			    var s = today.getSeconds();
 			    m = checkTime(m);
 			    s = checkTime(s);
-			    document.getElementById('time').innerHTML = h + ":" + m + ":" + s;
+			    $('#time').html(h + ":" + m + ":" + s);
+			    
+			    // Checking if the traffic signal data is present
 			    if (traffic_signal_data != null && current_cycle < traffic_signal_data.length) {
 			    	if(timestamp + traffic_signal_data[current_cycle]['timer'] > Date.now()/1000) {
 			    		$.each(traffic_signals, function (key, tl) {
@@ -195,9 +203,31 @@
 								t.find('.red').css('opacity', 1);
 			    			}
 			    		});
+			    		// console.log(parseInt(traffic_signal_data[current_cycle]['timer']));
+			    		// console.log(parseInt(Date.now()/1000));
+			    		$.each(traffic_signal_data, function(i, d) {
+			    			var timer = d['timer'];
+			    			$.each(traffic_signal_data, function(j, k) {
+			    				if (j<i) {
+			    					timer += d['timer'];
+			    				}
+			    			});
+			    			// var timer = temp - (parseInt(Date.now()/1000) - timestamp);
+			    			$.each(timer_data, function(tl_id, timer) {
+			    				// timer_data[tl_id]--;
+			    				$('#'+tl_id+'_timer').html(timer_data[tl_id]);
+			    			});
+			    			// if(i != current_cycle) {
+
+			    			// } else {
+			    			// 	$('#')http://localhost:5000/signal
+			    			// }
+			    		});
+			    		$('.timer').html(traffic_signal_data[current_cycle]['timer'] - (parseInt(Date.now()/1000) - timestamp));
 			    	} else {
 		    			timestamp += traffic_signal_data[current_cycle]['timer'];
 		    			current_cycle += 1;
+		    			$('.timer').html(0);
 			    	}
 			    	if(current_cycle >= total_no_of_cycles) {
 			    		if(simulation_running) {
@@ -206,23 +236,40 @@
 			    		}
 			    	}
 			    }
-			    var t = setTimeout(startTime, 500);
+			    var t = setTimeout(startTime, 1000);
 			}
+			
 			function checkTime(i) {
 			    if (i < 10) {i = "0" + i};  // add zero in front of numbers < 10
 			    return i;
 			}
 			startTime();
 
+			function makeTimer() {
+				$.each(traffic_signal_data, function(index, data) {
+					var temp = data['timer'];
+					$.each(traffic_signal_data, function(i, j) {
+						if(i<index) {
+							temp += j['timer'];
+						}
+					});
+					timer_data[data['tl_id']] = temp;
+				});
+			}
+
 			function populateTL() {
 				for(var i=0; i<traffic_signals.length; i++) {
 					if($('#'+traffic_signals[i]).length == 0) {
 						var html_str = '\
 						<div class="tl_frame" id="'+traffic_signals[i]+'">\
-							<h4>'+traffic_signals[i]+'</h4>\
+							<h4>tl2</h4>\
 							<div class="light red"></div>\
 							<div class="light orange"></div>\
 							<div class="light green"></div>\
+							<hr />\
+							<p>\
+								<h3 id="'+traffic_signals[i]+'_timer" style="color:green"> 2 4 </h3>\
+							</p>\
 						</div>';
 						$('#cluster_view').append(html_str);
 					}
@@ -245,9 +292,10 @@
 			}
 
 			$('#join').click(function () {
-				tl_id = $('#tl_id').val();
+				// tl_id = $('#tl_id').val();
 				cluster_id = $('#cluster_id').val();
-				socket.emit('join-tl-cluster', {"tl_id": tl_id, "cluster_id": cluster_id});
+				console.log(cluster_id);
+				socket.emit('join-tl-cluster', {"cluster_id": cluster_id});
 		   		return false;
 			});
 
@@ -278,10 +326,12 @@
 				console.log(data);
 				$('#log').append('<p>'+ data.message + '   ' +JSON.stringify(data.data) +'</p>');
 				traffic_signal_data = data.data;
-				timestamp = data.timestamp;
+				timestamp = parseInt(data.timestamp);
 				total_no_of_cycles = traffic_signal_data.length;
 				current_cycle = 0;
 				simulation_running = true;
+				makeTimer();
+				// console.log(timer_data);
 			});
 		});
 	</script>

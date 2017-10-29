@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import json
 import math
+import os
 
 from jsonParser import parseClusterData
 
@@ -21,7 +22,7 @@ def getTrafficData(json_data, image = "default.png"):
     roads = parseClusterData(json_data)
 
     # Reads the Image and converts it to matrix
-    snapshot = cv2.imread("trafficSnaps/" + image , -1)
+    snapshot = cv2.imread(os.getcwd() + "/DyReTra/trafficSnaps/" + image , -1)
 
     # Tries to convert the imaged to HSV from BGR
     try:

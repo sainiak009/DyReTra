@@ -17,6 +17,11 @@ api.add_resource(getDirectionsEV, '/getDirectionsEV')
 api.add_resource(getMapSnap, '/getMapSnap')
 
 
+# Static files routes
+@app.route('/img/<path:path>')
+def send_js(path):
+    return send_from_directory('js', path)
+
 # All general routes will go here
 @app.route('/signal')
 def traffic_signal():
@@ -41,26 +46,26 @@ def EV_simulator():
 
 @app.route('/getNearbyCluster', methods=['POST', 'GET'])
 def getNearbyCluster():
-	ev_id = request.args.get('ev_id', None)
-	lat = request.args.get('lat', None)
-	lon = request.args.get('lon', None)
-	if ev_id and lat and lon:
-		return json.dumps({"code": 0, "data": getEVClusters(float(lat), float(lon)), "message": "All nearby clusters"})
-	else:
-		return json.dumps({"code": 0, "data": [], "message": "Invalid Input"})
+    ev_id = request.args.get('ev_id', None)
+    lat = request.args.get('lat', None)
+    lon = request.args.get('lon', None)
+    if ev_id and lat and lon:
+        return json.dumps({"code": 0, "data": getEVClusters(float(lat), float(lon)), "message": "All nearby clusters"})
+    else:
+        return json.dumps({"code": 0, "data": [], "message": "Invalid Input"})
 
 
 @app.route('/changeClusterStatus', methods=['POST', 'GET'])
 def changeClusterStatus(): #Todo
-	lat = request.args.get('lat', None)
-	lon = request.args.get('lon', None)
-	ev_lat = request.args.get('ev_lat', None)
-	ev_lon = request.args.get('ev_lon', None)
-	cluster_id = 1
-	if cluster_id and ev_lat and ev_lon:
-		changeClusterStatusforEV(cluster_id, ev_lat, ev_lon)
-		return "1"
-	return "0"
+    lat = request.args.get('lat', None)
+    lon = request.args.get('lon', None)
+    ev_lat = request.args.get('ev_lat', None)
+    ev_lon = request.args.get('ev_lon', None)
+    cluster_id = 1
+    if cluster_id and ev_lat and ev_lon:
+        changeClusterStatusforEV(cluster_id, ev_lat, ev_lon)
+        return "1"
+    return "0"
 
 
 if __name__ == "__main__":

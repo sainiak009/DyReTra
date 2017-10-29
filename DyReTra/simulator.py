@@ -60,10 +60,13 @@ def _calculateTime(cluster_id):
             }
     """
     cluster_density = _simulateTrafficDensity(cluster_id)
-    sorted_cluster_density = sorted(cluster_density.items(), key=operator.itemgetter(1), reverse=True)
+    # print(cluster_density)
+    # sorted_cluster_density = sorted(cluster_density.items(), key=operator.itemgetter(1), reverse=True)
+    # print(sorted_cluster_density)
+    cluster_density = cluster_density.items()
     traffic_signals = []
     total_time = 0
-    for i in sorted_cluster_density:
+    for i in cluster_density:
         temp = {}
         green_time = 10
         temp['tl_id'] = i[0]
@@ -142,7 +145,7 @@ def changeClusterStatusforEV(cluster_id, lat, lon):
         traffic_lights_data = cluster.getTrafficLights()
         if traffic_lights_data:
             for tl in traffic_lights_data:
-                if tl['slope'] == getRoadSlope(cluster['coordinates']['lat'], cluster['coordinates']['lon'], lat, lon):
+               if tl['slope'] == getRoadSlope(cluster['coordinates']['lat'], cluster['coordinates']['lon'], lat, lon):
                     break
     else:
         pass

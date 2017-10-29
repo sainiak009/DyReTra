@@ -8,13 +8,11 @@ class SocketData(Db):
 
     def __init__(self, sid=None):
         Db.__init__(self)
-        self.coll_name = "traffic_signal_data"
+        self.coll_name = "socket_data"
         self._exists = False
         self._schema = {
-            "cluster_id": None,  # String,
-            "tl_id": [],  # Traffic signal data
             "sid": None,
-            "status": None,  # 0 or 1
+            "status": None,  # -1 or 1
             "timestamp": None  # timestamp
         }
         if self.coll_name not in self.db.collection_names():
