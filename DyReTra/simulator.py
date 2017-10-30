@@ -3,7 +3,7 @@ from random import randint
 from datetime import datetime
 
 from models.trafficCluster import TrafficCluster
-from sockets import emit_state
+from sockets import emit_state, emit_image_data
 from utils import getRoadSlope
 from models.allJobs import AllJobs
 from models.trafficSignalData import TrafficSignalData
@@ -40,6 +40,7 @@ def _simulateTrafficDensity(cluster_id):
     if cluster.exists():
         cluster_data = cluster.get()
         image_path = getSnap(cluster_data['coordinates']['lat'], cluster_data['coordinates']['lon'])
+        
         density_data = getTrafficData(cluster_data)
         traffic_lights_data = cluster.getAllTrafficLights()
         for i, j in enumerate(traffic_lights_data):

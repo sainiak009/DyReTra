@@ -104,6 +104,12 @@ def emit_state(cluster_id, tl_signal, total_time, timestamp):
     socketio.emit('simulate-cluster-response', {"message": "Signal Received", "data": tl_signal, "timestamp": timestamp}, room=cluster_id, namespace="/tl")
 
 
+def emit_image_data(cluster_id, img_path):
+    """
+        Emits the path of the cluster snapshot taken using maps API
+    """
+    socketio.emit('get-image-data', {"message": "Cluster image path recieved", "data": {"img_path": img_path}, "timestamp": int(time.time())}, room=cluster_id, namespace="/tl")
+
 def run():
     """
         Method to run socket
