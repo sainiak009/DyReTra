@@ -49,7 +49,7 @@ def getSnap(lat, lon):
     # setting file name for snapshot
     addr = str(uuid.uuid4())[:10]
     filename = addr + '.png'
-    path = dir_path + '/trafficSnaps/' + filename
+    path = dir_path + '/static/img/trafficSnaps/' + filename
     driver.save_screenshot(path)
     driver.quit()
     return filename

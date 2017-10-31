@@ -40,7 +40,7 @@ def _simulateTrafficDensity(cluster_id):
     if cluster.exists():
         cluster_data = cluster.get()
         image_path = getSnap(cluster_data['coordinates']['lat'], cluster_data['coordinates']['lon'])
-        
+        emit_image_data(cluster_id, "/static/img/trafficSnaps/"+image_path)
         density_data = getTrafficData(cluster_data)
         traffic_lights_data = cluster.getAllTrafficLights()
         for i, j in enumerate(traffic_lights_data):

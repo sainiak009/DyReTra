@@ -80,7 +80,7 @@
 			height: 100%;
 		}
 
-		#map {
+		#controller, #map {
 			height: 600px;
 		}
 
@@ -110,7 +110,7 @@
 				</div>
 			</div>
 			<div class="col-md-4">
-				<div class="card">
+				<div id="controller" class="card">
 					<div class="card-body">
 						<div class="form">
 							<div class="row">
@@ -178,7 +178,9 @@
 
 	<script type="text/javascript">
 		$(document).ready(function() {
+			var signal_timestamp = null;
 			var cluster_id = null;
+			var coordinates = null;
 			var tl_id = null;
 			var traffic_signals = null;
 			var traffic_signal_data = null;
@@ -222,10 +224,6 @@
 			    				}
 			    			});
 			    			// var timer = temp - (parseInt(Date.now()/1000) - timestamp);
-			    			$.each(timer_data, function(tl_id, timer) {
-			    				// timer_data[tl_id]--;
-			    				$('#'+tl_id+'_timer').html(timer_data[tl_id]);
-			    			});
 			    			// if(i != current_cycle) {
 
 			    			// } else {
@@ -246,6 +244,20 @@
 			    	}
 			    }
 			    var t = setTimeout(startTime, 1000);
+			    setTimeout(function () {
+			    	var temp = timer_data['total_time'];
+			    	if(timer_data != {} && signal_timestamp + parseInt(temp) > Date.now()/1000) {
+				    	console.log(timer_data['total_time']);
+				    	$.each(timer_data, function(tl_id, timer) {
+		    				// timer_data[tl_id]--;
+		    				if(timer_data[tl_id] >= 0) {
+		    					$('#'+tl_id+'_timer').html(timer_data[tl_id]--);
+		    				} else {
+		    					$('#'+tl_id+'_timer').html("- -");
+		    				}
+		    			});
+				   	}
+			    }, 1000);
 			}
 			
 			function checkTime(i) {
@@ -255,6 +267,7 @@
 			startTime();
 
 			function makeTimer() {
+				var total = 0;
 				$.each(traffic_signal_data, function(index, data) {
 					var temp = data['timer'];
 					$.each(traffic_signal_data, function(i, j) {
@@ -262,8 +275,10 @@
 							temp += j['timer'];
 						}
 					});
+					total += temp;
 					timer_data[data['tl_id']] = temp;
 				});
+				timer_data["total_time"] = total.toString();
 			}
 
 			function populateTL() {
@@ -271,13 +286,13 @@
 					if($('#'+traffic_signals[i]).length == 0) {
 						var html_str = '\
 						<div class="tl_frame" id="'+traffic_signals[i]+'">\
-							<h4>tl2</h4>\
+							<h4 style="text-transform: uppercase;">'+traffic_signals[i]+'</h4>\
 							<div class="light red"></div>\
 							<div class="light orange"></div>\
 							<div class="light green"></div>\
 							<hr />\
 							<p>\
-								<h3 id="'+traffic_signals[i]+'_timer" style="color:green"> 2 4 </h3>\
+								<h3 id="'+traffic_signals[i]+'_timer" style="color:green"> - - </h3>\
 							</p>\
 						</div>';
 						$('#cluster_view').append(html_str);
@@ -323,6 +338,7 @@
 				console.log(data);
 				$('#log').append('<p>'+ data.message + '</p>');
 				traffic_signals = data.cluster_data;
+				coordinates = data.coordinates;
 				populateTL();
 			});
 
@@ -335,12 +351,18 @@
 				console.log(data);
 				$('#log').append('<p>'+ data.message + '   ' +JSON.stringify(data.data) +'</p>');
 				traffic_signal_data = data.data;
+				signal_timestamp = parseInt(data.timestamp)
 				timestamp = parseInt(data.timestamp);
 				total_no_of_cycles = traffic_signal_data.length;
 				current_cycle = 0;
 				simulation_running = true;
 				makeTimer();
-				// console.log(timer_data);
+			});
+
+			socket.on('get-cluster-image', function(data) {
+				console.log(data);
+				$('#log').append('<p>'+ data.message + '   ' + JSON.stringify(data.data) + '</p>');
+				$('#map_image').attr('src', data.data.img_path)
 			});
 		});
 	</script>

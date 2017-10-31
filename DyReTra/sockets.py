@@ -48,26 +48,14 @@ def joinTrafficCluster(data):
             simulate-cluster-response - Last running simulation data of the cluster
     """
     sid = request.sid
-    # print(sid)
-    # tl_id = data['tl_id']
     cluster_id = data['cluster_id']
-    # s = SocketData(sid)
-    # if s.exists():
-    #     s.update_status(1)
-    # else:
-    #     s.create({"cluster_id": cluster_id, "tl_id": tl_id, "sid": sid, "timestamp": datetime.now().timestamp(), "status": 1})
     join_room(cluster_id)
     cluster = TrafficCluster(cluster_id)
     traffic_signals = cluster.getTrafficLights()
     ts = [i['tl_id'] for i in traffic_signals]
     cluster_data = cluster.get()
     del cluster_data['_id']
-    # c = ClusterActiveData(cluster_id)
-    # if c.exists():
-    #     c.increment()
-    # else:
-    #     c.create({"cluster_id": cluster_id, "alive_connection": 1, "simulator_tl_id": tl_id, "timestamp": datetime.now().timestamp()})
-    emit('join-cluster-response', {"message": "Joined Cluster " + cluster_id, "cluster_data": ts}, room=cluster_id)
+    emit('join-cluster-response', {"message": "Joined Cluster " + cluster_id, "cluster_data": ts, "coordinates": cluster_data["coordinates"]}, room=cluster_id)
     cluster_signal = TrafficSignalData(cluster_id)
     cluster_signal_data = cluster_signal.get()
     emit('simulate-cluster-response',
@@ -108,7 +96,7 @@ def emit_image_data(cluster_id, img_path):
     """
         Emits the path of the cluster snapshot taken using maps API
     """
-    socketio.emit('get-image-data', {"message": "Cluster image path recieved", "data": {"img_path": img_path}, "timestamp": int(time.time())}, room=cluster_id, namespace="/tl")
+    socketio.emit('get-cluster-image', {"message": "Cluster image path recieved", "data": {"img_path": img_path}, "timestamp": int(time.time())}, room=cluster_id, namespace="/tl")
 
 def run():
     """

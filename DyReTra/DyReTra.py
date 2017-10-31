@@ -1,7 +1,7 @@
 from config import app
 from sockets import run as start_socket
 from simulator import simulateCluster, changeClusterStatusforEV
-from flask import render_template, request
+from flask import render_template, request, send_from_directory
 from flask_restful import Api
 from config_values import GOOGLE_KEY
 from api import *
