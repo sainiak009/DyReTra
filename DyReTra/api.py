@@ -27,9 +27,9 @@ MapTrafficParser.add_argument('longitude', type=float, required=True)
 
 def getSnap(lat, lon):
     # Setting Proxy
-    PROXY = "172.16.2.30:8080"
+    # PROXY = "172.16.2.30:8080"
     chrome_options = webdriver.ChromeOptions()
-    chrome_options.add_argument('--proxy-server=%s' % PROXY)
+    # chrome_options.add_argument('--proxy-server=%s' % PROXY)
     chrome_options.add_argument('--proxy-bypass-list=%s' % "127.0.0.1*;localhost*")
 
     # Adding "chromedriver" to PATH
